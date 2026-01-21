@@ -109,9 +109,8 @@ namespace KitaplikApp.Controllers
                 sepetDetayi.Miktar = yeniMiktar;
                 _context.SepetDetaylari.Update(sepetDetayi);
             }
-
-            // YANLIŞ KOD KALDIRILDI: kitap.Stok -= miktar;
-            // Stok, sadece sipariş oluşturulduğunda düşürülmelidir.
+           
+            // Stok, sadece sipariş oluşturulduğunda düşürülmelidir
 
             sepet.SonGuncellemeTarihi = DateTime.Now;
             _context.Sepetler.Update(sepet);
