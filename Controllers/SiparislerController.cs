@@ -201,7 +201,7 @@ namespace KitaplikApp.Controllers
                 return Json(new { success = false, message = "Bu siparişi güncelleme yetkiniz yoktur." });
             }
             
-            // YENİ KOD: Sipariş iptal edildiğinde stokları geri ekle
+            // Sipariş iptal edildiğinde stokları geri ekle
             if (siparisToUpdate.SiparisDurumu != "İptal Edildi" && siparisModel.SiparisDurumu == "İptal Edildi")
             {
                 foreach (var siparisDetay in siparisToUpdate.SiparisDetaylaris!)
@@ -214,7 +214,6 @@ namespace KitaplikApp.Controllers
                     }
                 }
             }
-            // YENİ KOD BİTİŞ
 
             siparisToUpdate.SiparisDurumu = siparisModel.SiparisDurumu;
 
@@ -294,7 +293,7 @@ namespace KitaplikApp.Controllers
                 return RedirectToAction("Index", "Sepet");
             }
             
-            // YENİ KOD: Siparişten önce stok kontrolü ve stoğu düşürme
+            // Siparişten önce stok kontrolü ve stoğu düşürme
             foreach (var sepetDetayi in sepet.SepetDetaylari!)
             {
                 var kitap = sepetDetayi.Kitap;
@@ -315,7 +314,6 @@ namespace KitaplikApp.Controllers
                 kitap.Stok -= sepetDetayi.Miktar;
                 _context.Update(kitap);
             }
-            // YENİ KOD BİTİŞ
 
             if (siparisModel.TeslimatAdresId == 0)
             {
@@ -339,14 +337,14 @@ namespace KitaplikApp.Controllers
             _context.Add(yeniSiparis);
             await _context.SaveChangesAsync();
             
-            // YENİ KOD: Sipariş oluştuktan sonra faturayı oluştur
+            // Sipariş oluştuktan sonra faturayı oluştur
             var yeniFatura = new Faturalar
             {
                 SiparisId = yeniSiparis.SiparisId,
                 FaturaTarihi = DateTime.Now
             };
             _context.Add(yeniFatura);
-            // YENİ KOD BİTİŞ
+
 
             // Sepet Detaylarını Sipariş Detaylarına dönüştür
             foreach (var sepetDetay in sepet.SepetDetaylari)
