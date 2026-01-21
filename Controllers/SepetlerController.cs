@@ -41,7 +41,7 @@ namespace KitaplikApp.Controllers
             return View(sepet);
         }
 
-        // POST: Sepet/AddItem (Stok düşürme kodu KALDIRILDI)
+        // POST: Sepet/AddItem 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddItem(int kitapId, int miktar = 1)
@@ -125,7 +125,7 @@ namespace KitaplikApp.Controllers
             return Json(new { success = true, message = $"{kitap.Baslik} sepete eklendi!", cartItemCount = updatedCartItemCount });
         }
 
-        // POST: Sepet/RemoveFromCart (Stok artırma kodu KALDIRILDI)
+        // POST: Sepet/RemoveFromCart 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveFromCart(int sepetDetayId)
@@ -146,7 +146,6 @@ namespace KitaplikApp.Controllers
                 return Json(new { success = false, message = "Sepet öğesi bulunamadı veya yetkiniz yok." });
             }
 
-            // YANLIŞ KOD KALDIRILDI: kitap.Stok += sepetDetayi.Miktar;
             // Stok zaten sepete eklenirken düşürülmediği için geri artırılmasına gerek yok.
 
             _context.SepetDetaylari.Remove(sepetDetayi);
@@ -160,7 +159,7 @@ namespace KitaplikApp.Controllers
             return Json(new { success = true, message = "Ürün sepetten kaldırıldı.", cartItemCount = updatedCartItemCount });
         }
 
-        // POST: Sepet/UpdateCartItemQuantity (Stok güncelleme kodu KALDIRILDI)
+        // POST: Sepet/UpdateCartItemQuantity 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateCartItemQuantity(int sepetDetayId, int newQuantity)
@@ -197,8 +196,7 @@ namespace KitaplikApp.Controllers
                 successMessage = "Ürün sepetten kaldırıldı.";
             }
             else
-            {
-                // YANLIŞ KOD KALDIRILDI: sepetDetayi.Kitap.Stok += eskiMiktar - newQuantity;
+            {            
                 // Stok, sadece sipariş tamamlandığında düşürülmelidir.
                 sepetDetayi.Miktar = newQuantity;
                 sepetDetayi.BirimFiyat = sepetDetayi.Kitap.Fiyat;
