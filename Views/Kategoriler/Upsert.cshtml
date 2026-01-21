@@ -1,0 +1,18 @@
+@model KitaplikApp.Models.Kategoriler
+
+<form id="upsertForm" asp-action="Upsert">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    
+    <input type="hidden" asp-for="KategoriId" />
+
+    <div class="form-group mb-3">
+        <label asp-for="KategoriAdi" class="control-label"></label>
+        <input asp-for="KategoriAdi" class="form-control" />
+        <span asp-validation-for="KategoriAdi" class="text-danger"></span>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+    </div>
+</form>

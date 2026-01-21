@@ -1,0 +1,372 @@
+@model KitaplikApp.Models.Kitaplar
+@using System.Security.Claims
+
+@{
+    Layout = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest" ? null : "_Layout";
+
+    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var userRole = User.FindFirstValue(ClaimTypes.Role);
+    bool isAuthorizedForAdminFunctions = User.IsInRole("Admin") || (User.IsInRole("Satici") && Model.SaticiKullaniciId.ToString() == currentUserId);
+}
+
+@if (Layout == null)
+{
+    <div class="modal-header">
+        <h5 class="modal-title" id="detailsModalLabel">@Model.Baslik Detayları</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+}
+
+<div class="@(Layout == null ? "modal-body" : "container py-5")">
+    <div class="row">
+        <div class="col-md-8">
+            <dl class="row">
+                <dt class="col-sm-3">Yazar:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Yazar!.YazarAdi)</dd>
+
+                <dt class="col-sm-3">Yayınevi:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Yayinevi!.YayineviAdi)</dd>
+
+                <dt class="col-sm-3">Açıklama:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Aciklama)</dd>
+
+                <dt class="col-sm-3">Basım Yılı:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.BasimYili)</dd>
+
+                <dt class="col-sm-3">Sayfa Sayısı:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.SayfaSayisi)</dd>
+
+                <dt class="col-sm-3">Fiyat:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Fiyat) TL</dd>
+            
+                <dt class="col-sm-3">Kategori:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Kategori!.KategoriAdi)</dd>
+
+                <dt class="col-sm-3">Satıcı:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.SaticiKullanici!.Ad) @Html.DisplayFor(model => model.SaticiKullanici.Soyad)</dd>
+
+                <dt class="col-sm-3">Kitap Durumu:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.KitapDurumu!.DurumAdi)</dd>
+
+                @* YENİ EKLENEN KOD: Stok bilgisi *@
+                <dt class="col-sm-3">Stok Adedi:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Stok)</dd>
+            </dl>
+        </div>
+        
+        @* Kitap Görselleri *@
+        <div class="col-md-4">
+            @if (Model.KitapGorselleri != null && Model.KitapGorselleri.Any())
+            {
+                <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner rounded">
+                        @{
+                            var isFirst = true;
+                            foreach (var gorsel in Model.KitapGorselleri.OrderBy(g => g.GosterimSirasi))
+                            {
+                                <div class="carousel-item @(isFirst ? "active" : "")">
+                                    <img src="@gorsel.ResimUrl" class="d-block w-100" alt="@Model.Baslik Resmi">
+                                </div>
+                                isFirst = false;
+                            }
+                        }
+                    </div>
+                    @if (Model.KitapGorselleri.Count > 1)
+                    {
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    }
+                </div>
+            }
+            else
+            {
+                <img src="/images/no-image-available.png" class="img-fluid rounded" alt="Görsel Yok" />
+                <p class="mt-2 text-muted text-center">Bu kitap için görsel bulunmamaktadır.</p>
+            }
+        </div>
+    </div>
+    
+    <div class="mt-4 mb-4">
+        <div class="d-flex align-items-center">
+            @* Sepete Ekle Formu *@
+            @if ((User.IsInRole("Kullanici") || User.IsInRole("Satici")) && Model.SaticiKullaniciId.ToString() != currentUserId)
+            {
+                @if (Model.Stok > 0)
+                {
+                    <form id="addToCartForm" asp-controller="Sepetler" asp-action="AddItem" method="post" class="d-inline-block">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="kitapId" value="@Model.KitapId" />
+                        <input type="hidden" name="miktar" value="1" />
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-cart"></i> Sepete Ekle
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <span class="text-danger me-3">Bu ürünün stoğu tükendi.</span>
+                }
+            }
+    
+            @* Favorilere Ekle/Çıkar Formları *@
+            @if (User.IsInRole("Kullanici") || User.IsInRole("Satici"))
+            {
+                <form id="addToFavoritesForm" class="d-inline-block ms-2">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="kitapId" value="@Model.KitapId" />
+                    <button type="submit" class="btn btn-outline-danger btn-lg">
+                        <i class="bi bi-heart"></i> Favorilere Ekle
+                    </button>
+                </form>
+                <form id="removeFromFavoritesForm" class="d-inline-block ms-2 d-none">
+                     @Html.AntiForgeryToken()
+                     <input type="hidden" name="kitapId" value="@Model.KitapId" />
+                     <button type="submit" class="btn btn-danger btn-lg">
+                         <i class="bi bi-heart-fill"></i> Favorilerden Çıkar
+                     </button>
+                </form>
+            }
+        </div>
+    </div>
+    
+    @* Yorumlar ve Yorum Ekleme Bölümü *@
+    <div class="mt-4">
+        <h4>Yorumlar ve Puanlar</h4>
+        <hr />
+        <div id="comment-list-container">
+            @if (Model.Yorumlars != null && Model.Yorumlars.Any())
+            {
+                <ul class="list-group">
+                    @foreach (var yorum in Model.Yorumlars.OrderByDescending(y => y.YorumTarihi))
+                    {
+                        <li class="list-group-item mb-2">
+                            <strong>@yorum.Kullanici!.Ad @yorum.Kullanici.Soyad</strong>
+                            <div class="d-inline-block small text-warning ms-2">
+                                @{
+                                    for (int i = 0; i < yorum.Puan; i++)
+                                    {
+                                        <i class="bi bi-star-fill"></i>
+                                    }
+                                    for (int i = yorum.Puan; i < 5; i++)
+                                    {
+                                        <i class="bi bi-star"></i>
+                                    }
+                                }
+                            </div>
+                            <small class="text-muted"> - @yorum.YorumTarihi.ToShortDateString()</small><br />
+                            <p>@yorum.YorumMetni</p>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p id="no-comment-message" class="text-muted">Bu kitap için henüz yorum bulunmamaktadır.</p>
+            }
+        </div>
+        
+        @* Yorum Ekleme Formu - Sadece Kullanici veya Satici rolündeyse görünür *@
+        @if (User.IsInRole("Kullanici") || User.IsInRole("Satici"))
+        {
+            <div class="mt-4 p-3 border rounded">
+                <h5>Yorum Yapın</h5>
+                <div id="comment-status-message"></div>
+                <form id="addCommentForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="KitapId" value="@Model.KitapId" />
+                    <input type="hidden" name="KullaniciId" value="@currentUserId" />
+                    
+                    <div class="mb-3">
+                        <label for="puan" class="form-label">Puanınız (1-5)</label>
+                        <select id="puan" name="Puan" class="form-control" required>
+                            <option value="">Puan Seçin</option>
+                            <option value="1">1 - Kötü</option>
+                            <option value="2">2 - Orta</option>
+                            <option value="3">3 - İyi</option>
+                            <option value="4">4 - Çok İyi</option>
+                            <option value="5">5 - Mükemmel</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="yorumMetni" class="form-label">Yorumunuz</label>
+                        <textarea id="yorumMetni" name="YorumMetni" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success">Yorumu Gönder</button>
+                </form>
+            </div>
+        }
+    </div>
+</div>
+
+@if (Layout == null)
+{
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+        @if (User.IsInRole("Satici") && Model.SaticiKullaniciId.ToString() == currentUserId)
+        {
+            <button type="button" class="btn btn-warning btn-modal-open" data-bs-toggle="modal" data-bs-target="#modalPlaceholder"
+                    data-url="@Url.Action("Upsert", new { id = Model.KitapId })">Düzenle</button>
+        }
+    </div>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            var kitapId = @Model.KitapId;
+            var userId = '@(currentUserId)';
+            
+            function showNotification(message, type = 'success') {
+                var statusContainer = $('#statusMessageContainer');
+                if (statusContainer.length === 0) {
+                     statusContainer = $('main > .container');
+                     statusContainer.prepend('<div id="statusMessageContainer"></div>');
+                     statusContainer = $('#statusMessageContainer');
+                }
+                statusContainer.empty();
+                var alertDiv = `
+                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                statusContainer.html(alertDiv);
+                setTimeout(function() {
+                    statusContainer.empty();
+                }, 5000);
+            }
+
+            function checkFavoriteStatus() {
+                if (userId) {
+                    $.get('/Favoriler/CheckFavoriteStatus?kitapId=' + kitapId, function(data) {
+                        if (data.isFavorite) {
+                            $('#addToFavoritesForm').hide();
+                            $('#removeFromFavoritesForm').show();
+                        } else {
+                            $('#addToFavoritesForm').show();
+                            $('#removeFromFavoritesForm').hide();
+                        }
+                    });
+                } else {
+                    $('#addToFavoritesForm').hide();
+                    $('#removeFromFavoritesForm').hide();
+                }
+            }
+            checkFavoriteStatus();
+            
+            $(document).on('submit', '#addToFavoritesForm', function(e) {
+                e.preventDefault();
+                var form = $(this);
+                $.ajax({
+                    url: '@Url.Action("Add", "Favoriler")',
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            showNotification(response.message, 'success');
+                            checkFavoriteStatus();
+                        } else {
+                            showNotification(response.message, 'info');
+                        }
+                    }
+                });
+            });
+
+            $(document).on('submit', '#removeFromFavoritesForm', function(e) {
+                e.preventDefault();
+                var form = $(this);
+                $.ajax({
+                    url: '@Url.Action("Remove", "Favoriler")',
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            showNotification(response.message, 'success');
+                            checkFavoriteStatus();
+                        } else {
+                            showNotification(response.message, 'danger');
+                        }
+                    }
+                });
+            });
+            
+            $(document).on('submit', '#addCommentForm', function(e) {
+                e.preventDefault();
+                var form = $(this);
+                var yorumMetni = $('#yorumMetni').val();
+                var puan = $('#puan').val();
+
+                if (!yorumMetni || !puan) {
+                    showNotification("Lütfen yorum ve puan alanlarını doldurun.", "danger");
+                    return;
+                }
+
+                $.ajax({
+                    url: '@Url.Action("AddComment", "Kitaplar")',
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            showNotification(response.message, 'success');
+                            var newComment = `
+                                <li class="list-group-item mb-2">
+                                    <strong>@(User.Identity.Name)</strong>
+                                    <div class="d-inline-block small text-warning ms-2">
+                                        ${getStars(puan)}
+                                    </div>
+                                    <small class="text-muted"> - ${new Date().toLocaleDateString()}</small><br />
+                                    <p>${yorumMetni}</p>
+                                </li>
+                            `;
+                            if ($('#no-comment-message').length) {
+                                $('#comment-list-container').html('<ul class="list-group"></ul>');
+                            }
+                            $('#comment-list-container ul').prepend(newComment);
+                            $('#addCommentForm')[0].reset();
+
+                        } else {
+                            showNotification(response.message, 'danger');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        showNotification("Yorum eklenirken bir hata oluştu.", "danger");
+                    }
+                });
+            });
+
+            function getStars(puan) {
+                let starsHtml = '';
+                for (let i = 0; i < puan; i++) {
+                    starsHtml += '<i class="bi bi-star-fill"></i>';
+                }
+                for (let i = puan; i < 5; i++) {
+                    starsHtml += '<i class="bi bi-star"></i>';
+                }
+                return starsHtml;
+            }
+            
+            $(document).on('submit', '#addToCartForm', function(e) {
+                e.preventDefault();
+                var form = $(this);
+                $.ajax({
+                    url: form.attr('action'),
+                    type: form.attr('method'),
+                    data: form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            showNotification(response.message, 'success');
+                        } else {
+                            showNotification(response.message, 'danger');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

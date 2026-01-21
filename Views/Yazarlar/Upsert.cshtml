@@ -1,0 +1,23 @@
+@model KitaplikApp.Models.Yazarlar
+
+<form id="upsertForm" asp-action="Upsert">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    
+    <input type="hidden" asp-for="YazarId" />
+
+    <div class="form-group mb-3">
+        <label asp-for="YazarAdi" class="control-label"></label>
+        <input asp-for="YazarAdi" class="form-control" />
+        <span asp-validation-for="YazarAdi" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="Biyografi" class="control-label"></label>
+        <textarea asp-for="Biyografi" class="form-control" rows="5"></textarea>
+        <span asp-validation-for="Biyografi" class="text-danger"></span>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+    </div>
+</form>

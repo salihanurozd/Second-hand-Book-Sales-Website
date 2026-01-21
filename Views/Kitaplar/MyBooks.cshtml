@@ -1,0 +1,193 @@
+@model IEnumerable<KitaplikApp.Models.Kitaplar>
+
+@{
+    ViewData["Title"] = "Kitaplarım";
+}
+
+<h1>Kitaplarım</h1>
+
+<p>
+    <button type="button" class="btn btn-primary btn-modal-open" data-bs-toggle="modal" data-bs-target="#modalPlaceholder"
+            data-url="@Url.Action("Upsert", "Kitaplar", new { id = 0 })"
+            title="Yeni Kitap Ekle">Yeni Kitap Ekle</button>
+</p>
+
+@if (Model.Any())
+{
+    <div id="statusMessageContainer" class="mt-3"></div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.KitapGorselleri)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Baslik)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Fiyat)
+                </th>
+                @* YENİ EKLENEN KOD: Stok Sütunu Başlığı *@
+                <th>
+                    @Html.DisplayNameFor(model => model.Stok)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Kategori)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.OnayDurumu)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr id="kitap-item-@(item.KitapId)">
+                    <td>
+                        @if (item.KitapGorselleri != null && item.KitapGorselleri.Any())
+                        {
+                            <img src="@item.KitapGorselleri.FirstOrDefault().ResimUrl" alt="Kitap Resmi" style="max-height: 100px; max-width: 100px;" />
+                        }
+                        else
+                        {
+                            <img src="~/images/placeholder.png" alt="Resim Yok" style="max-height: 100px; max-width: 100px;" />
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Baslik)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Fiyat)
+                    </td>
+                    @* YENİ EKLENEN KOD: Stok bilgisi *@
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Stok)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Kategori.KategoriAdi)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OnayDurumu)
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-info btn-sm btn-modal-open"
+                                data-bs-toggle="modal" data-bs-target="#modalPlaceholder"
+                                data-url="@Url.Action("Details", "Kitaplar", new { id = item.KitapId })"
+                                title="Kitap Detayları">Detaylar</button>
+                        <button type="button" class="btn btn-warning btn-sm btn-modal-open"
+                                data-bs-toggle="modal" data-bs-target="#modalPlaceholder"
+                                data-url="@Url.Action("Upsert", "Kitaplar", new { id = item.KitapId })"
+                                title="Kitabı Düzenle">Düzenle</button>
+                        <button type="button" class="btn btn-danger btn-sm btn-modal-open"
+                                data-bs-toggle="modal" data-bs-target="#modalPlaceholder"
+                                data-url="@Url.Action("Delete", "Kitaplar", new { id = item.KitapId })"
+                                title="Kitabı Sil">Sil</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Henüz eklenmiş kitabınız bulunmamaktadır. <a asp-action="Upsert">Hemen yeni bir kitap ekleyin!</a></p>
+}
+
+@* Modallar için tek placeholder *@
+<div class="modal fade" id="modalPlaceholder" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="modalContent">
+            </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var modalPlaceholder = $('#modalPlaceholder');
+            var modalContent = $('#modalContent');
+
+            // Modal açıldığında içeriği AJAX ile yükle
+            $(document).on('click', '.btn-modal-open', function (e) {
+                e.preventDefault();
+                var url = $(this).data('url');
+                modalContent.html('<div class="d-flex justify-content-center align-items-center" style="height: 200px;"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Yükleniyor...</span></div></div>');
+                
+                // AJAX ile içeriği al ve modalı göster
+                $.get(url, function (data) {
+                    modalContent.html(data);
+                    modalPlaceholder.modal('show');
+                }).fail(function() {
+                    modalContent.html('<div class="alert alert-danger">İçerik yüklenemedi. Bir hata oluştu.</div>');
+                    modalPlaceholder.modal('show');
+                });
+            });
+
+            // AJAX form gönderimi (Upsert ve Delete için)
+            $(document).on('submit', '#upsertForm, #deleteForm', function (e) {
+                e.preventDefault();
+
+                var form = $(this);
+                var url = form.attr('action');
+                var type = form.attr('method');
+                var formData;
+                var contentType;
+                var processData;
+
+                if (form.attr('id') === 'upsertForm') {
+                    formData = new FormData(this);
+                    contentType = false;
+                    processData = false;
+                } else {
+                    formData = form.serialize();
+                    contentType = 'application/x-www-form-urlencoded; charset=UTF-8';
+                    processData = true;
+                }
+
+                $.ajax({
+                    type: type,
+                    url: url,
+                    data: formData,
+                    contentType: contentType,
+                    processData: processData,
+                    success: function (response) {
+                        if (response.success) {
+                            modalPlaceholder.modal('hide');
+                            
+                            var statusContainer = $('#statusMessageContainer');
+                            statusContainer.html('<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                                                 response.message +
+                                                 '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                                 '</div>');
+                            
+                            // Sayfayı 1 saniye sonra yenile
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            if (response.message) {
+                                modalContent.html('<div class="alert alert-danger">' + response.message + '</div>');
+                            } else {
+                                modalContent.html(response); 
+                            }
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        modalPlaceholder.modal('hide');
+                        var statusContainer = $('#statusMessageContainer');
+                        statusContainer.html('<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                                             'Bir hata oluştu: ' + xhr.responseText +
+                                             '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                             '</div>');
+                        setTimeout(function () {
+                            $('.alert').alert('close');
+                        }, 5000);
+                        console.error('AJAX Hatası:', error);
+                    }
+                });
+            });
+        });
+    </script>
+}

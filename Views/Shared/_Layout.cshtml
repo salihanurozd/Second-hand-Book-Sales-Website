@@ -1,0 +1,191 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="İkinci el kitapların alınıp satıldığı online platform." />
+    <meta name="author" content="Sahaf Diyarı" />
+    <title>@ViewData["Title"] - Sahaf Diyarı</title>
+    <link rel="icon" type="image/x-icon" href="~/assets/favicon.ico" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.2.0/mdb.min.css" rel="stylesheet" />
+
+    <link href="~/css/styles.css" rel="stylesheet" />
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container px-4 px-lg-5">
+            <a class="navbar-brand fw-bold" href="/">Sahaf Diyarı</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item"><a class="nav-link" aria-current="page" asp-controller="Home" asp-action="Index">Ana Sayfa</a></li>
+                    
+                    @if (!User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Alışveriş</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" asp-controller="Kitaplar" asp-action="MainIndex">Tüm Kitaplar</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Kitaplar" asp-action="PopulerKitaplar">Popüler Kitaplar</a></li>
+                                <li><a class="dropdown-item" asp-controller="Kitaplar" asp-action="YeniEklenenler">Yeni Eklenenler</a></li>
+                            </ul>
+                        </li>
+                    }
+                    
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-primary" id="AdminDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Admin Paneli</a>
+                            <ul class="dropdown-menu" aria-labelledby="AdminDropdown">
+                                <li><a class="dropdown-item" asp-controller="Admin" asp-action="Index">Kullanıcı Yönetimi</a></li>
+                                <li><a class="dropdown-item" asp-controller="Admin" asp-action="SellerApplications">Satıcı Başvuruları</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Kitaplar" asp-action="Index">Tüm Kitapları Yönet</a></li>
+                                <li><a class="dropdown-item" asp-controller="Kategoriler" asp-action="Index">Kategori Yönetimi</a></li>
+                                <li><a class="dropdown-item" asp-controller="Yazarlar" asp-action="Index">Yazar Yönetimi</a></li>
+                                <li><a class="dropdown-item" asp-controller="Yayinevleri" asp-action="Index">Yayınevi Yönetimi</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Siparisler" asp-action="Index">Tüm Siparişleri Yönet</a></li>
+                            </ul>
+                        </li>
+                    }
+                    @if (User.IsInRole("Satici"))
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-success" id="SaticiDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Satıcı Paneli</a>
+                            <ul class="dropdown-menu" aria-labelledby="SaticiDropdown">
+                                <li><a class="dropdown-item" asp-controller="Kitaplar" asp-action="MyBooks">Kitaplarım</a></li>
+                                <li><a class="dropdown-item" asp-controller="Siparisler" asp-action="GelenSiparisler">Gelen Siparişlerim</a></li>
+                            </ul>
+                        </li>
+                    }
+
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="HesabimDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Hesabım</a>
+                            <ul class="dropdown-menu" aria-labelledby="HesabimDropdown">
+                                <li><a class="dropdown-item" asp-controller="Dashboard" asp-action="Index">Panelim</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                @if (User.IsInRole("Kullanici") || User.IsInRole("Satici"))
+                                {
+                                    <li><a class="dropdown-item" asp-controller="Favoriler" asp-action="Index">Favorilerim</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Siparisler" asp-action="Index">Siparişlerim</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                }
+                                <li><a class="dropdown-item" asp-controller="Kullanicilar" asp-action="ManageProfile">Profil Ayarları</a></li> 
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Account" asp-action="Logout">Çıkış Yap</a></li>
+                            </ul>
+                        </li>
+                    }
+                </ul>
+                <partial name="_LoginStatusPartial" /> 
+                @if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin"))
+                {
+                    <a class="btn btn-outline-light ms-lg-3" asp-controller="Sepetler" asp-action="Index">
+                        <i class="bi-cart-fill me-1"></i>
+                        Sepet
+                        <span id="cart-item-count" class="badge bg-light text-dark ms-1 rounded-pill">
+                            0
+                        </span>
+                    </a>
+                }
+            </div>
+        </div>
+    </nav>
+    <header class="bg-dark py-5">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="text-center text-white">
+                <h1 class="display-4 fw-bolder">Sahaf Diyarı</h1>
+                <p class="lead fw-normal text-white-50 mb-0">Aradığın Kitaplar Burada!</p>
+            </div>
+        </div>
+    </header>
+
+    <main role="main">
+        <div class="container px-4 px-lg-5">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="py-5 bg-dark text-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+                    <h5 class="text-uppercase fw-bold">Sahaf Diyarı</h5>
+                    <p class="text-white-50">
+                        Online ikinci el kitap satış platformumuzda aradığınız tüm eserleri bulabilirsiniz. Keyifli okumalar dileriz.
+                    </p>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+                    <h5 class="text-uppercase fw-bold">Hızlı Erişim</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/" class="text-white-50 text-decoration-none">Ana Sayfa</a></li>
+                        <li><a asp-controller="Kitaplar" asp-action="MainIndex" class="text-white-50 text-decoration-none">Tüm Kitaplar</a></li>
+                        <li><a href="#!" class="text-white-50 text-decoration-none">Gizlilik Politikası</a></li>
+                        <li><a href="#!" class="text-white-50 text-decoration-none">Kullanım Koşulları</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4 col-md-12">
+                    <h5 class="text-uppercase fw-bold">İletişim</h5>
+                    <ul class="list-unstyled text-white-50">
+                        <li><i class="bi bi-geo-alt-fill me-2"></i> Şişli, İstanbul, Türkiye</li>
+                        <li><i class="bi bi-envelope-fill me-2"></i> info@sahafdiyari.com</li>
+                        <li><i class="bi bi-phone-fill me-2"></i> +90 212 555 55 55</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4 text-white-50">
+            <div class="row">
+                <div class="col-12 text-center text-white-50">
+                    <p class="m-0">Telif Hakkı &copy; Sahaf Diyarı @DateTime.Now.Year. Tüm Hakları Saklıdır.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.2.0/mdb.min.js"></script>
+    <script src="~/js/scripts.js"></script>
+    <script>
+        function updateCartCountInHeader() {
+            $.get('/Sepetler/GetCartItemCount', function (response) {
+                if (response.success) {
+                    $('#cart-item-count').text(response.count);
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            updateCartCountInHeader();
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

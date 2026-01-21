@@ -1,0 +1,154 @@
+@model KitaplikApp.Models.Siparisler
+
+@{
+    ViewData["Title"] = "Siparişi Tamamla";
+    var sepet = ViewBag.Sepet as KitaplikApp.Models.Sepetler; 
+    decimal toplamSepetTutar = 0;
+    if (sepet != null && sepet.SepetDetaylari != null)
+    {
+        toplamSepetTutar = sepet.SepetDetaylari.Sum(sd => sd.Miktar * sd.BirimFiyat);
+    }
+}
+
+<h1>Siparişi Tamamla</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success mt-3" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger mt-3" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <h4 class="mt-4">Sepet Özeti</h4>
+        @if (sepet != null && sepet.SepetDetaylari != null && sepet.SepetDetaylari.Any())
+        {
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">Kitap</th>
+                        <th style="width: 15%;">Miktar</th>
+                        <th style="width: 20%;" class="text-end">Birim Fiyat</th>
+                        <th style="width: 25%;" class="text-end">Toplam</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in sepet.SepetDetaylari)
+                    {
+                        <tr>
+                        <td>
+                            @* Kitap görseli ve başlığını gösterme *@
+                            @{
+                                var ilkGorsel = item.Kitap?.KitapGorselleri?.OrderBy(g => g.GosterimSirasi).FirstOrDefault();
+                            }
+                            @if (ilkGorsel != null)
+                            {
+                                <img src="/images/@ilkGorsel.ResimUrl" alt="@item.Kitap?.Baslik" class="img-thumbnail me-2" style="width: 50px; height: auto;">
+                            }
+                            else
+                            {
+                                <img src="/images/default_book.png" alt="Varsayılan Kitap" class="img-thumbnail me-2" style="width: 50px; height: auto;">
+                            }
+                            @item.Kitap?.Baslik
+                        </td>
+                            <td>@item.Miktar</td>
+                            <td class="text-end">@item.BirimFiyat TL</td>
+                            <td class="text-end">@(item.Miktar * item.BirimFiyat) TL</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Genel Toplam:</strong></td>
+                        <td class="text-end"><strong>@toplamSepetTutar TL</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        }
+        else
+        {
+            <div class="alert alert-warning">Sepetiniz boş. Lütfen alışverişe devam edin.</div>
+            <a asp-action="Index" asp-controller="Kitaplar" class="btn btn-info mt-2">Alışverişe Devam Et</a>
+        }
+
+        <h4 class="mt-4">Teslimat Adresi Seçimi</h4>
+        <form asp-action="PlaceOrder" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="TeslimatAdresId" class="control-label">Teslimat Adresiniz</label>
+                <select asp-for="TeslimatAdresId" class="form-control" asp-items="@(ViewData["TeslimatAdresId"] as SelectList)">
+                    <option value="">Lütfen bir adres seçin</option>
+                </select>
+                <span asp-validation-for="TeslimatAdresId" class="text-danger"></span>
+            </div>
+
+            @* Ödeme Yöntemi *@
+            <h4 class="mt-4">Ödeme Yöntemi</h4>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="paymentMethod1" value="KapidaOdeme" checked>
+                <label class="form-check-label" for="paymentMethod1">
+                    Kapıda Ödeme
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="paymentMethod2" value="KrediKarti" disabled>
+                <label class="form-check-label" for="paymentMethod2">
+                    Kredi Kartı (Yakında)
+                </label>
+            </div>
+
+            <div class="form-group mt-4">
+                @if (sepet != null && sepet.SepetDetaylari.Any())
+                {
+                    <button type="submit" class="btn btn-success btn-lg"><i class="bi bi-check-circle"></i> Siparişi Onayla ve Tamamla</button>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-success btn-lg" disabled><i class="bi bi-check-circle"></i> Siparişi Onayla ve Tamamla</button>
+                }
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4">
+        <div class="card mt-4">
+            <div class="card-header">Sipariş Özeti</div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Toplam Ürün Adedi
+                        <span class="badge bg-primary rounded-pill">@(sepet?.SepetDetaylari?.Sum(sd => sd.Miktar) ?? 0)</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Ara Toplam
+                        <span>@toplamSepetTutar TL</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Kargo Ücreti
+                        <span>0.00 TL</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center fw-bold">
+                        Ödenecek Tutar
+                        <span>@toplamSepetTutar TL</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" asp-controller="Sepet" class="btn btn-secondary mt-3"><i class="bi bi-arrow-left-circle"></i> Sepete Geri Dön</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+}

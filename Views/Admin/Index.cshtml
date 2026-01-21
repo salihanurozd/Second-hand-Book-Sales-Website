@@ -1,0 +1,217 @@
+@model IEnumerable<KitaplikApp.Models.Kullanicilar>
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Kullanıcı Yönetimi";
+    var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+}
+
+@if (!string.IsNullOrEmpty(TempData["SuccessMessage"] as string))
+{
+    <div class="alert alert-success mt-3" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (!string.IsNullOrEmpty(TempData["ErrorMessage"] as string))
+{
+    <div class="alert alert-danger mt-3" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<h1>Kullanıcı Yönetimi</h1>
+
+<p>
+    <button id="btn-create-user" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#userModal" data-url="@Url.Action("EditUser", "Admin")">
+        Yeni Kullanıcı Oluştur
+    </button>
+</p>
+
+<div id="kullanici-list-container">
+    <table class="table table-striped table-hover mt-3">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Ad)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Soyad)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Eposta)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TelefonNumarasi)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Rol.RolAdi)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.KayitTarihi)
+                </th>
+                <th class="text-end">İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Ad)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Soyad)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Eposta)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TelefonNumarasi)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Rol.RolAdi)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.KayitTarihi)
+                    </td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-info me-2 btn-details-user" data-bs-toggle="modal" data-bs-target="#userModal" data-url="@Url.Action("Details", new { id = item.KullaniciId })" title="Kullanıcı Detayları">Detaylar</button>
+                        <button class="btn btn-sm btn-warning me-2 btn-edit-user" data-bs-toggle="modal" data-bs-target="#userModal" data-url="@Url.Action("EditUser", new { id = item.KullaniciId })" title="Kullanıcıyı Düzenle">Düzenle</button>
+                        
+                        @if (item.KullaniciId.ToString() != currentUserId)
+                        {
+                            <button class="btn btn-sm btn-danger btn-delete-user" data-bs-toggle="modal" data-bs-target="#userModal" data-url="@Url.Action("DeleteUser", new { id = item.KullaniciId })" title="Kullanıcıyı Sil">Sil</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-sm btn-danger" disabled title="Kendi hesabınızı silemezsiniz.">Sil</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info mt-4" role="alert">
+        Henüz hiç kullanıcı bulunmamaktadır. Yeni bir kullanıcı oluşturarak başlayabilirsiniz.
+    </div>
+}
+
+<div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body" id="modal-body-content">
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <script>
+        $(document).ready(function () {
+            var modalPlaceholder = $('#modal-body-content');
+            var userModal = $('#userModal');
+
+            $(document).on('click', '.btn-edit-user, .btn-details-user, .btn-delete-user', function (e) {
+                e.preventDefault();
+                var url = $(this).data('url');
+                var title = $(this).attr('title') || 'Kullanıcı İşlemi';
+                
+                modalPlaceholder.empty();
+
+                $.get(url, function (data) {
+                    modalPlaceholder.html(data);
+                    $.validator.unobtrusive.parse(modalPlaceholder.find('form'));
+                });
+            });
+            
+            $('#btn-create-user').on('click', function (e) {
+                e.preventDefault();
+                var url = $(this).data('url');
+                var title = 'Yeni Kullanıcı Oluştur';
+                modalPlaceholder.empty(); 
+                $.get(url, function (data) {
+                    modalPlaceholder.html(data);
+                    $.validator.unobtrusive.parse(modalPlaceholder.find('form'));
+                });
+            });
+
+            $(document).on('submit', '#upsertForm', function (e) {
+                e.preventDefault();
+                var form = $(this);
+                if (form.valid()) {
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: 'POST',
+                        data: form.serialize(),
+                        success: function (response) {
+                            if (response.success) {
+                                userModal.modal('hide');
+                                showToast(response.message, 'success');
+                                location.reload();
+                            } else {
+                                modalPlaceholder.html(response);
+                                $.validator.unobtrusive.parse(modalPlaceholder.find('form'));
+                            }
+                        },
+                        error: function () {
+                            showToast('Bir hata oluştu, lütfen tekrar deneyin.', 'error');
+                        }
+                    });
+                }
+            });
+
+            $(document).on('submit', '#deleteForm', function (e) {
+                e.preventDefault();
+                var form = $(this);
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            userModal.modal('hide');
+                            showToast(response.message, 'success');
+                            location.reload();
+                        } else {
+                             showToast(response.message, 'error');
+                        }
+                    },
+                    error: function () {
+                        showToast('Bir hata oluştu, lütfen tekrar deneyin.', 'error');
+                    }
+                });
+            });
+
+            userModal.on('hidden.bs.modal', function () {
+                modalPlaceholder.html('');
+            });
+
+            function showToast(message, type) {
+                var bgColor = (type === 'success') ? 'bg-success' : 'bg-danger';
+                var toastContainer = $('#toast-container');
+                if (!toastContainer.length) {
+                    toastContainer = $('<div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11"></div>');
+                    $('body').append(toastContainer);
+                }
+                var toast = $(`<div class="toast align-items-center text-white ${bgColor} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                                <div class="d-flex">
+                                    <div class="toast-body">
+                                        ${message}
+                                    </div>
+                                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                                </div>
+                            </div>`);
+                toastContainer.append(toast);
+                var bsToast = new bootstrap.Toast(toast);
+                bsToast.show();
+            }
+        });
+    </script>
+}

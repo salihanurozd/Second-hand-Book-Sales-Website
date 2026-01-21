@@ -1,0 +1,62 @@
+@model KitaplikApp.Models.Kullanicilar
+@using System.Security.Claims
+
+@{
+    Layout = null;
+    var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    bool isCurrentUserAdmin = (Model.KullaniciId.ToString() == currentUserId);
+}
+
+<div class="modal-header">
+    <h5 class="modal-title" id="userModalLabel">Kullanıcı Detayları</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Ad)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Ad)</dd>
+        
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Soyad)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Soyad)</dd>
+        
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Eposta)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Eposta)</dd>
+        
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.TelefonNumarasi)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.TelefonNumarasi)</dd>
+        
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Rol)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Rol!.RolAdi)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.KayitTarihi)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.KayitTarihi)</dd>
+        
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.SonGirisTarihi)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.SonGirisTarihi)</dd>
+    </dl>
+    
+    @* Sadece yöneticinin kendi profilini görüntülemediği durumlarda adresleri göster *@
+    @if (Model.Adresler != null && Model.Adresler.Any() && !isCurrentUserAdmin)
+    {
+        <h4 class="mt-4">Adresler</h4>
+        <ul class="list-group">
+            @foreach (var adres in Model.Adresler)
+            {
+                <li class="list-group-item mb-2">
+                    <strong>@adres.AdresBasligi</strong><br />
+                    @adres.AcikAdres<br />
+                    @adres.Ilce, @adres.Sehir, @adres.PostaKodu 
+                </li>
+            }
+        </ul>
+    }
+    else if (Model.Adresler == null || !Model.Adresler.Any())
+    {
+        <p class="mt-4 text-muted">Bu kullanıcıya kayıtlı adres bulunmamaktadır.</p>
+    }
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+</div>

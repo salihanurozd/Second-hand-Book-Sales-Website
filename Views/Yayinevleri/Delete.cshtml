@@ -1,0 +1,39 @@
+@model KitaplikApp.Models.Yayinevleri
+
+@{
+    ViewData["Title"] = "Yayınevi Sil";
+}
+
+<h1>Sil</h1>
+
+<h3>Bu yayınevini silmek istediğinizden emin misiniz?</h3>
+<div>
+    <h4>Yayınevleri</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.YayineviAdi)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.YayineviAdi)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Adres)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Adres)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Telefon)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Telefon)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete" method="post" class="mt-4"> 
+        <input type="hidden" asp-for="YayineviId" />
+        <input type="submit" value="Sil" class="btn btn-danger me-2" /> 
+        <a asp-action="Index" class="btn btn-secondary">Listeye Geri Dön</a>
+    </form>
+</div>

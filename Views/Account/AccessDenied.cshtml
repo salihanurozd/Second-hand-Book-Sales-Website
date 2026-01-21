@@ -1,0 +1,17 @@
+@{
+    ViewData["Title"] = "Erişim Reddedildi";
+}
+
+<h1 class="text-danger">Erişim Reddedildi</h1>
+<h2 class="text-danger">Bu sayfaya erişim yetkiniz bulunmamaktadır.</h2>
+
+<div class="mt-4">
+    <p>
+        Eğer bir sorun olduğunu düşünüyorsanız, lütfen yöneticinizle iletişime geçin veya
+        <a asp-controller="Home" asp-action="Index">Ana Sayfaya geri dönün</a>.
+    </p>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <p>Hesabınızla ilgili başka bir işlem yapmak için <a asp-controller="Account" asp-action="Logout">Çıkış Yap</a> veya başka bir sayfaya gitmeyi deneyin.</p>
+    }
+</div>

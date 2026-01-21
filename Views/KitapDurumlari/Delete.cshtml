@@ -1,0 +1,27 @@
+@model KitaplikApp.Models.KitapDurumlari
+
+@{
+    ViewData["Title"] = "Kitap Durumu Sil";
+}
+
+<h1>Sil</h1>
+
+<h3>Bu kitap durumunu silmek istediğinizden emin misiniz?</h3>
+<div>
+    <h4>Kitap Durumu</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DurumAdi)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DurumAdi)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete" method="post" class="mt-4">
+        <input type="hidden" asp-for="DurumId" /> 
+        <input type="submit" value="Sil" class="btn btn-danger me-2" />
+        <a asp-action="Index" class="btn btn-secondary">Listeye Geri Dön</a>
+    </form>
+</div>

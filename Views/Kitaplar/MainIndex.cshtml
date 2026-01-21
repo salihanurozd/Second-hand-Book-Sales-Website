@@ -1,0 +1,144 @@
+@model KitaplikApp.ViewModels.KitapListelemeViewModel
+
+@{
+    ViewData["Title"] = "Kitaplar";
+}
+
+<h1>Kitaplar</h1>
+
+@* Filtreleme formu  *@
+<form asp-action="MainIndex" method="get">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-3 mb-2">
+            <input type="text" name="aramaKelimesi" value="@Model.AramaKelimesi" class="form-control" placeholder="Başlık veya yazar ara..." />
+        </div>
+        <div class="col-md-2 mb-2">
+            <select name="secilenKategoriId" class="form-control" asp-items="@Model.Kategoriler">
+                <option value="">Tüm Kategoriler</option>
+            </select>
+        </div>
+        <div class="col-md-2 mb-2">
+            <select name="secilenYazarId" class="form-control" asp-items="@Model.Yazarlar">
+                <option value="">Tüm Yazarlar</option>
+            </select>
+        </div>
+        <div class="col-md-3 mb-2">
+            <div class="input-group">
+                <span class="input-group-text">Fiyat</span>
+                <input type="number" name="minFiyat" value="@Model.MinFiyat" class="form-control" placeholder="Min" />
+                <span class="input-group-text">-</span>
+                <input type="number" name="maxFiyat" value="@Model.MaxFiyat" class="form-control" placeholder="Max" />
+            </div>
+        </div>
+        <div class="col-md-2 mb-2">
+            <button type="submit" class="btn btn-primary w-100">Filtrele</button>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12 text-end">
+            <a asp-action="MainIndex" class="btn btn-secondary">Filtreleri Temizle</a>
+        </div>
+    </div>
+</form>
+
+<hr />
+
+@if (Model.Kitaplar != null && Model.Kitaplar.Any())
+{
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+        @foreach (var kitap in Model.Kitaplar)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="@(kitap.KitapGorselleri.FirstOrDefault()?.ResimUrl ?? "/images/placeholder.png")" class="card-img-top book-card-img" alt="@kitap.Baslik">
+                    <div class="card-body">
+                        <h5 class="card-title">@kitap.Baslik</h5>
+                        <p class="card-text">
+                            <strong>Yazar:</strong> @kitap.Yazar.YazarAdi <br />
+                            <strong>Kategori:</strong> @kitap.Kategori.KategoriAdi <br />
+                            <strong>Fiyat:</strong> @kitap.Fiyat TL <br />
+                            @* YENİ EKLENEN KOD: Stok bilgisi *@
+                            <strong>Stok:</strong> 
+                            @if (kitap.Stok > 0)
+                            {
+                                <span>@kitap.Stok</span>
+                            }
+                            else
+                            {
+                                <span class="text-danger">Stokta Yok</span>
+                            }
+                            <br/>
+                        </p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center bg-white border-0">
+                        <a asp-controller="Kitaplar" asp-action="Details" asp-route-id="@kitap.KitapId" class="btn btn-primary btn-sm">Detaylar</a>
+
+                        @* YENİ EKLENEN KOD: Stok kontrolü *@
+                        @if (User.Identity.IsAuthenticated && User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != kitap.SaticiKullaniciId.ToString() && kitap.Stok > 0)
+                        {
+                            <button type="button" class="btn btn-success btn-sm add-to-cart-btn" data-kitap-id="@kitap.KitapId">Sepete Ekle</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-warning" role="alert">
+        Filtreleme kriterlerinize uygun kitap bulunamadı.
+    </div>
+}
+
+<style>
+    .book-card-img {
+        width: 100%;
+        height: 250px;
+        object-fit: contain; 
+        padding-top: 5px; 
+    }
+    
+    .card-footer {
+        padding-top: 0;
+        border-top: none;
+    }
+</style>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function () {
+            $('.add-to-cart-btn').click(function () {
+                var kitapId = $(this).data('kitap-id');
+                var token = $('input[name="__RequestVerificationToken"]').val();
+
+                $.ajax({
+                    url: '/Sepetler/AddItem',
+                    type: 'POST',
+                    data: {
+                        __RequestVerificationToken: token,
+                        kitapId: kitapId,
+                        miktar: 1 
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            alert(response.message);
+                            $('#cart-item-count').text(response.cartItemCount);
+                            // Sepete ekleme başarılı olduktan sonra sayfayı yenilemek veya stoğu azaltmak için
+                            // bu kısma bir logic eklenebilir, şimdilik sadece alert ile bildirim yapıyoruz.
+
+                        } else {
+                            alert('Hata: ' + response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert("İşlem sırasında bir hata oluştu. Lütfen tekrar deneyin.");
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+}

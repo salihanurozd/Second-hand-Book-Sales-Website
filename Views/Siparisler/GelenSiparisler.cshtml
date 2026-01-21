@@ -1,0 +1,202 @@
+@model IEnumerable<KitaplikApp.Models.Siparisler>
+@{
+    ViewData["Title"] = "Gelen Siparişlerim";
+    var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+}
+
+<h1>Gelen Siparişlerim</h1>
+<div id="ajaxStatusMessageContainer" class="mt-3"></div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info mt-4" role="alert">
+        Henüz size ulaşan bir sipariş bulunmamaktadır.
+    </div>
+}
+else
+{
+    <table class="table table-striped table-hover mt-3">
+        <thead>
+            <tr>
+                <th>Sipariş No</th>
+                <th>Alıcı</th>
+                <th>Sipariş Tarihi</th>
+                <th>Toplam Tutar</th>
+                <th>Durum</th>
+                <th class="text-center">İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr id="siparis-@item.SiparisId">
+                    <td>@item.SiparisId</td>
+                    <td>@(item.AliciKullanici?.Ad + " " + item.AliciKullanici?.Soyad)</td>
+                    <td>@item.SiparisTarihi.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@item.ToplamTutar TL</td>
+                    <td>
+                        @if (item.SiparisDurumu == "Beklemede")
+                        {
+                            <span class="badge bg-warning text-dark">@item.SiparisDurumu</span>
+                        }
+                        else if (item.SiparisDurumu == "Hazırlanıyor")
+                        {
+                            <span class="badge bg-info text-dark">@item.SiparisDurumu</span>
+                        }
+                        else if (item.SiparisDurumu == "Kargoda")
+                        {
+                            <span class="badge bg-primary">@item.SiparisDurumu</span>
+                        }
+                        else if (item.SiparisDurumu == "Teslim Edildi")
+                        {
+                            <span class="badge bg-success">@item.SiparisDurumu</span>
+                        }
+                        else if (item.SiparisDurumu == "İptal Edildi")
+                        {
+                            <span class="badge bg-danger">@item.SiparisDurumu</span>
+                        }
+                        else
+                        {
+                            <span>@item.SiparisDurumu</span>
+                        }
+                    </td>
+                    <td class="text-center">
+                        @* Detaylar butonu  *@
+                        <button type="button" class="btn btn-info btn-sm details-btn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-id="@item.SiparisId" title="Detaylar">
+                            <i class="bi bi-eye"></i> Detaylar
+                        </button>
+                        @* Durum butonu *@
+                        <button type="button" class="btn btn-warning btn-sm ms-2 update-status-btn" data-bs-toggle="modal" data-bs-target="#updateStatusModal" data-id="@item.SiparisId" title="Durumu Güncelle">
+                            <i class="bi bi-pencil"></i> Durum
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@* Detaylar Modalı *@
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailsModalLabel">Sipariş Detayları</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="detailsModalBody">
+        </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@* Durum Güncelleme Modalı *@
+<div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updateStatusModalLabel">Sipariş Durumu Güncelle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="updateStatusModalBody">
+        </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    @Html.AntiForgeryToken()
+    <script>
+        $(document).ready(function () {
+            function showStatusMessage(isSuccess, message) {
+                var statusContainer = $('#ajaxStatusMessageContainer');
+                statusContainer.empty();
+                var alertClass = isSuccess ? 'alert-success' : 'alert-danger';
+                var alertDiv = `<div class="alert ${alertClass} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+                statusContainer.append(alertDiv);
+                setTimeout(function () {
+                    $('.alert').alert('close');
+                }, 5000);
+            }
+
+            // Detaylar Modal İçeriği AJAX 
+            $('#detailsModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var siparisId = button.data('id');
+                var modal = $(this);
+                
+                modal.find('.modal-title').text(`Sipariş Detayları: #${siparisId}`);
+
+                $.ajax({
+                    url: '@Url.Action("Details", "Siparisler")',
+                    type: 'GET',
+                    data: { id: siparisId },
+                    success: function (html) {
+                        modal.find('#detailsModalBody').html(html);
+                    },
+                    error: function () {
+                        showStatusMessage(false, 'Sipariş detayları yüklenirken bir hata oluştu.');
+                        modal.modal('hide');
+                    }
+                });
+            });
+
+            // Durum Güncelleme Modal İçeriği AJAX 
+            $('#updateStatusModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var siparisId = button.data('id');
+                var modal = $(this);
+                
+                modal.find('.modal-title').text(`Sipariş Durumu Güncelle: #${siparisId}`);
+
+                $.ajax({
+                    url: '@Url.Action("UpdateStatus", "Siparisler")',
+                    type: 'GET',
+                    data: { id: siparisId },
+                    success: function (html) {
+                        modal.find('#updateStatusModalBody').html(html);
+                    },
+                    error: function () {
+                        showStatusMessage(false, 'Sipariş durumu formu yüklenirken bir hata oluştu.');
+                        modal.modal('hide');
+                    }
+                });
+            });
+
+            // Durum Güncelleme Formu Gönderme AJAX  
+            $(document).on('submit', '#updateStatusForm', function (e) {
+                e.preventDefault();
+                var form = $(this);
+                var siparisId = form.find('input[name="id"]').val();
+
+                $.ajax({
+                    url: '@Url.Action("UpdateStatusConfirmed", "Siparisler")',
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            $('#updateStatusModal').modal('hide');
+                            showStatusMessage(true, response.message);
+                            // Sayfayı yenilemek yerine sadece ilgili satırı güncelleyebiliriz
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 1000);
+
+                        } else {
+                            showStatusMessage(false, response.message);
+                        }
+                    },
+                    error: function () {
+                        showStatusMessage(false, 'Durum güncelleme işlemi sırasında bir hata oluştu.');
+                    }
+                });
+            });
+
+        });
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+}

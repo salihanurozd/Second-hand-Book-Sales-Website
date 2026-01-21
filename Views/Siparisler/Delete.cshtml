@@ -1,0 +1,130 @@
+@model KitaplikApp.Models.Siparisler
+@{
+    ViewData["Title"] = "Siparişi Sil: " + Model.SiparisId;
+    var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    // Satıcının siparişi silip silemeyeceğini kontrol etmek için basit bir örnek
+    var isSellerOfThisOrder = Model.SiparisDetaylaris?.Any(sd => sd.Kitap?.SaticiKullaniciId == int.Parse(currentUserId ?? "0")) ?? false;
+}
+
+<h1 class="text-danger">Siparişi Sil</h1>
+<h3>Bu siparişi silmek istediğinizden emin misiniz?</h3>
+
+<div class="alert alert-warning">
+    <strong>Uyarı:</strong> Bu işlem geri alınamaz. Siparişi silmek, ilişkili tüm sipariş detaylarını da silecektir.
+</div>
+
+<div>
+    <hr />
+    <h4>Sipariş Numarası: @Model.SiparisId</h4>
+    <dl class="row">
+        <dt class="col-sm-3">Sipariş No</dt>
+        <dd class="col-sm-9">@Model.SiparisId</dd>
+
+        <dt class="col-sm-3">Sipariş Tarihi</dt>
+        <dd class="col-sm-9">@Model.SiparisTarihi.ToString("dd.MM.yyyy HH:mm")</dd>
+
+        <dt class="col-sm-3">Toplam Tutar</dt>
+        <dd class="col-sm-9">@Model.ToplamTutar TL</dd>
+
+        <dt class="col-sm-3">Durum</dt>
+        <dd class="col-sm-9">
+            @if (Model.SiparisDurumu == "Beklemede")
+            {
+                <span class="badge bg-warning text-dark">@Model.SiparisDurumu</span>
+            }
+            else if (Model.SiparisDurumu == "Hazırlanıyor")
+            {
+                <span class="badge bg-info text-dark">@Model.SiparisDurumu</span>
+            }
+            else if (Model.SiparisDurumu == "Kargoda")
+            {
+                <span class="badge bg-primary">@Model.SiparisDurumu</span>
+            }
+            else if (Model.SiparisDurumu == "Teslim Edildi")
+            {
+                <span class="badge bg-success">@Model.SiparisDurumu</span>
+            }
+            else if (Model.SiparisDurumu == "İptal Edildi")
+            {
+                <span class="badge bg-danger">@Model.SiparisDurumu</span>
+            }
+            else
+            {
+                <span>@Model.SiparisDurumu</span>
+            }
+        </dd>
+
+        <dt class="col-sm-3">Alıcı Kullanıcı</dt>
+        <dd class="col-sm-9">@(Model.AliciKullanici?.Ad + " " + Model.AliciKullanici?.Soyad) (@Model.AliciKullanici?.Eposta)</dd>
+
+        <dt class="col-sm-3">Teslimat Adresi</dt>
+        <dd class="col-sm-9">
+            @if (Model.TeslimatAdres != null)
+            {
+                <strong>@Model.TeslimatAdres.AdresBasligi</strong><br />
+                @Model.TeslimatAdres.AcikAdres<br />
+                @($"{Model.TeslimatAdres.Ilce} / {Model.TeslimatAdres.Sehir}, {Model.TeslimatAdres.PostaKodu}")<br />
+                <span>Telefon: @(Model.AliciKullanici?.TelefonNumarasi ?? "N/A")</span>
+            }
+            else
+            {
+                <span>Adres bilgisi bulunamadı.</span>
+            }
+        </dd>
+    </dl>
+
+    <h4 class="mt-4">Sipariş Edilen Ürünler</h4>
+    @if (Model.SiparisDetaylaris != null && Model.SiparisDetaylaris.Any())
+    {
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Kitap Adı</th>
+                    <th>Yazar</th>
+                    <th>Satıcı</th>
+                    <th class="text-end">Adet</th>
+                    <th class="text-end">Birim Fiyat</th>
+                    <th class="text-end">Ara Toplam</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detay in Model.SiparisDetaylaris)
+                {
+                    <tr>
+                        <td>@detay.Kitap?.Baslik</td>
+                        <td>@detay.Kitap?.Yazar?.YazarAdi</td>
+                        <td>@(detay.Kitap?.SaticiKullanici?.Ad + " " + detay.Kitap?.SaticiKullanici?.Soyad)</td>
+                        <td class="text-end">@detay.Adet</td>
+                        <td class="text-end">@detay.BirimFiyat TL</td>
+                        <td class="text-end">@((detay.Adet * detay.BirimFiyat)) TL</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-warning">Bu sipariş için detaylı ürün bilgisi bulunmamaktadır.</div>
+    }
+
+    @if (userRole == "Admin" || (userRole == "Satıcı" && isSellerOfThisOrder))
+    {
+        <form asp-action="Delete" method="post" class="mt-4">
+            <input type="hidden" asp-for="SiparisId" />
+            <button type="submit" class="btn btn-danger me-2"><i class="bi bi-trash"></i> Silme İşlemini Onayla</button>
+            <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> Sipariş Listesine Geri Dön</a>
+        </form>
+    }
+    else
+    {
+        <div class="alert alert-danger mt-4" role="alert">Bu siparişi silme yetkiniz bulunmamaktadır.</div>
+        <a asp-action="Index" class="btn btn-secondary mt-3"><i class="bi bi-arrow-left-circle"></i> Sipariş Listesine Geri Dön</a>
+    }
+
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+}

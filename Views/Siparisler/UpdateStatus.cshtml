@@ -1,0 +1,30 @@
+@model KitaplikApp.Models.Siparisler
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+}
+
+<div class="alert alert-info" role="alert">
+    Sipariş No: <strong>#@Model.SiparisId</strong> - Mevcut Durum: <strong>@Model.SiparisDurumu</strong>
+</div>
+
+<form id="updateStatusForm" asp-action="UpdateStatusConfirmed" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.SiparisId" />
+
+    <div class="form-group mb-3">
+        <label asp-for="SiparisDurumu" class="control-label">Yeni Durum</label>
+        <select asp-for="SiparisDurumu" class="form-select" asp-items="ViewBag.SiparisDurumlari as SelectList"></select>
+        <span asp-validation-for="SiparisDurumu" class="text-danger"></span>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+        <button type="submit" class="btn btn-primary">Durumu Güncelle</button>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

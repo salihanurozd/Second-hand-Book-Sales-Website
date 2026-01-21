@@ -1,0 +1,170 @@
+@model KitaplikApp.Models.KitapUpsertViewModel
+@using System.Security.Claims
+
+@{
+    Layout = null; 
+    var isCreate = Model.Kitap.KitapId == 0;
+    var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title" id="upsertModalLabel">@(isCreate ? "Yeni Kitap Ekle" : "Kitap Düzenle")</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<form asp-action="Upsert" method="post" enctype="multipart/form-data" id="upsertForm">
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                
+                <input type="hidden" asp-for="Kitap.KitapId" />
+                
+                @if (!isCreate)
+                {
+                    <input type="hidden" asp-for="Kitap.YayinlanmaTarihi" />
+                    <input type="hidden" asp-for="Kitap.SonGuncellenmeTarihi" />
+                }
+
+                @if (userRole == "Admin")
+                {
+                    <div class="form-group mb-3">
+                        <label asp-for="Kitap.SaticiKullaniciId" class="control-label"></label>
+                        <select asp-for="Kitap.SaticiKullaniciId" class="form-control" asp-items="Model.Saticilar"></select>
+                        <span asp-validation-for="Kitap.SaticiKullaniciId" class="text-danger"></span>
+                    </div>
+                }
+                else
+                {
+                    <input type="hidden" asp-for="Kitap.SaticiKullaniciId" value="@Model.Kitap.SaticiKullaniciId" />
+                    <div class="form-group mb-3">
+                        <label class="control-label">Satıcı</label>
+                        <input class="form-control" value="@(Model.Kitap.SaticiKullanici?.Eposta ?? "Bilinmiyor")" readonly />
+                    </div>
+                }
+
+                <div class="form-group mb-3">
+                    <label asp-for="Kitap.Baslik" class="control-label"></label>
+                    <input asp-for="Kitap.Baslik" class="form-control" />
+                    <span asp-validation-for="Kitap.Baslik" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Kitap.Aciklama" class="control-label"></label>
+                    <textarea asp-for="Kitap.Aciklama" class="form-control" rows="5"></textarea>
+                    <span asp-validation-for="Kitap.Aciklama" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Kitap.BasimYili" class="control-label"></label>
+                    <input asp-for="Kitap.BasimYili" class="form-control" />
+                    <span asp-validation-for="Kitap.BasimYili" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Kitap.SayfaSayisi" class="control-label"></label>
+                    <input asp-for="Kitap.SayfaSayisi" class="form-control" />
+                    <span asp-validation-for="Kitap.SayfaSayisi" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Kitap.Fiyat" class="control-label"></label>
+                    <input asp-for="Kitap.Fiyat" class="form-control" />
+                    <span asp-validation-for="Kitap.Fiyat" class="text-danger"></span>
+                </div>
+                
+                @* YENİ EKLENEN KOD: Stok Giriş Alanı *@
+                <div class="form-group mb-3">
+                    <label asp-for="Kitap.Stok" class="control-label"></label>
+                    <input asp-for="Kitap.Stok" class="form-control" type="number" />
+                    <span asp-validation-for="Kitap.Stok" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Kitap.KitapDurumuId" class="control-label"></label>
+                    <select asp-for="Kitap.KitapDurumuId" class="form-control" asp-items="Model.KitapDurumlari"></select>
+                    <span asp-validation-for="Kitap.KitapDurumuId" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Kitap.KategoriId" class="control-label"></label>
+                    <select asp-for="Kitap.KategoriId" class="form-control" asp-items="Model.Kategoriler"></select>
+                    <span asp-validation-for="Kitap.KategoriId" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Kitap.YazarId" class="control-label"></label>
+                    <select asp-for="Kitap.YazarId" class="form-control" asp-items="Model.Yazarlar"></select>
+                    <span asp-validation-for="Kitap.YazarId" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Kitap.YayineviId" class="control-label"></label>
+                    <select asp-for="Kitap.YayineviId" class="form-control" asp-items="Model.Yayinevleri"></select>
+                    <span asp-validation-for="Kitap.YayineviId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="KitapGorselleri" class="control-label">Kitap Görselleri (Birden fazla seçilebilir)</label>
+                    <input type="file" id="KitapGorselleri" name="KitapGorselleri" class="form-control" multiple accept="image/*" />
+                    <small class="text-muted">Mevcut görseller kitap detay sayfasında görüntülenecektir.</small>
+                </div>
+
+                @if (userRole == "Admin")
+                {
+                    <div class="form-group mb-3">
+                        <label asp-for="Kitap.OnayDurumu" class="control-label"></label>
+                        <select asp-for="Kitap.OnayDurumu" class="form-control">
+                            <option value="Beklemede">Beklemede</option>
+                            <option value="Onaylandı">Onaylandı</option>
+                            <option value="Reddedildi">Reddedildi</option>
+                        </select>
+                        <span asp-validation-for="Kitap.OnayDurumu" class="text-danger"></span>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group mb-3">
+                        <label class="control-label">Onay Durumu</label>
+                        <input asp-for="Kitap.OnayDurumu" class="form-control" readonly />
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+        <button type="submit" class="btn btn-primary">@(isCreate ? "Kitap Ekle" : "Değişiklikleri Kaydet")</button>
+    </div>
+</form>
+
+@* Form submit işlemi AJAX  *@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#upsertForm').on('submit', function(e) {
+            e.preventDefault(); 
+
+            var form = $(this);
+            // Form verilerini al
+            var formData = new FormData(form[0]);
+
+            if (form.valid()) { 
+                $.ajax({
+                    url: form.attr('action'),
+                    type: form.attr('method'),
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                            $('#mainModal').modal('hide'); 
+                            // Sayfayı yenile veya tabloyu güncelle
+                            location.reload(); 
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+                    }
+                });
+            }
+        });
+    });
+</script>

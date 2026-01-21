@@ -1,0 +1,232 @@
+@model IEnumerable<KitaplikApp.Models.Yayinevleri>
+@using System.Security.Claims;
+
+@{
+    ViewData["Title"] = "Yayınevleri";
+    var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+}
+
+<h1>Yayınevleri</h1>
+
+<div id="ajaxStatusMessageContainer" class="mt-3"></div>
+
+@if (userRole == "Admin")
+{
+    <p>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#upsertModal" data-id="0">
+            Yeni Yayınevi Ekle
+        </button>
+    </p>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info mt-4" role="alert">
+        Henüz hiç yayınevi bulunmamaktadır.
+        @if (userRole == "Admin")
+        {
+            <span>Yeni bir yayınevi ekleyerek başlayabilirsiniz.</span>
+        }
+    </div>
+}
+else
+{
+    <table class="table table-striped table-hover mt-3">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.YayineviAdi)</th>
+                <th>@Html.DisplayNameFor(model => model.Adres)</th>
+                <th>@Html.DisplayNameFor(model => model.Telefon)</th>
+                @if (userRole == "Admin")
+                {
+                    <th class="text-end">İşlemler</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr id="yayinevi-@item.YayineviId">
+                    <td>@Html.DisplayFor(modelItem => item.YayineviAdi)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Adres)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Telefon)</td>
+                    @if (userRole == "Admin")
+                    {
+                        <td class="text-end">
+                            @* Düzenle butonu  *@
+                            <button type="button" class="btn btn-sm btn-warning me-2 edit-btn" data-bs-toggle="modal" data-bs-target="#upsertModal" data-id="@item.YayineviId">Düzenle</button>
+                            
+                            @* Detaylar butonu  *@
+                            <button type="button" class="btn btn-sm btn-info me-2 details-btn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-id="@item.YayineviId">Detaylar</button>
+                            
+                            @* Sil butonu AJAX  *@
+                            <button type="button" class="btn btn-sm btn-danger delete-btn" data-id="@item.YayineviId">Sil</button>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@* Upsert Modalı *@
+<div class="modal fade" id="upsertModal" tabindex="-1" aria-labelledby="upsertModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="upsertModalLabel">Yayınevi Ekle/Düzenle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="upsertModalBody">
+        </div>
+    </div>
+  </div>
+</div>
+
+@* Detaylar Modalı *@
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailsModalLabel">Yayınevi Detayları</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="detailsModalBody">
+        </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    @Html.AntiForgeryToken()
+    <script>
+        $(document).ready(function () {
+            // Durum mesajları
+            function showStatusMessage(isSuccess, message) {
+                var statusContainer = $('#ajaxStatusMessageContainer');
+                statusContainer.empty();
+                var alertClass = isSuccess ? 'alert-success' : 'alert-danger';
+                var alertDiv = `<div class="alert ${alertClass} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+                statusContainer.append(alertDiv);
+                setTimeout(function () {
+                    $('.alert').alert('close');
+                }, 5000);
+            }
+
+            // Upsert Modal İçeriğini yükleme AJAX 
+            $('#upsertModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var yayineviId = button.data('id');
+                var modal = $(this);
+                
+                // Modal başlığını güncelle
+                modal.find('.modal-title').text(yayineviId == 0 ? "Yeni Yayınevi Ekle" : "Yayınevi Düzenle");
+
+                $.ajax({
+                    url: '@Url.Action("Upsert", "Yayinevleri")',
+                    type: 'GET',
+                    data: { id: yayineviId },
+                    success: function (html) {
+                        modal.find('#upsertModalBody').html(html);
+                        $.validator.unobtrusive.parse('#upsertForm');
+                    },
+                    error: function () {
+                        showStatusMessage(false, 'Yayınevi formu yüklenirken bir hata oluştu.');
+                        modal.modal('hide');
+                    }
+                });
+            });
+
+            // Upsert Formu Gönderme AJAX
+            $(document).on('submit', '#upsertForm', function (e) {
+                e.preventDefault();
+                var form = $(this);
+                if (form.valid()) {
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: 'POST',
+                        data: form.serialize(),
+                        success: function (response) {
+                            if (response.success) {
+                                $('#upsertModal').modal('hide');
+                                showStatusMessage(true, response.message);
+                                
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 1000);
+
+                            } else {
+                                showStatusMessage(false, response.message);
+                                var modelStateErrors = response.errors;
+                                if (modelStateErrors && modelStateErrors.length > 0) {
+                                    for(var i = 0; i < modelStateErrors.length; i++) {
+                                        showStatusMessage(false, modelStateErrors[i]);
+                                    }
+                                }
+                            }
+                        },
+                        error: function () {
+                            showStatusMessage(false, 'Kaydetme işlemi sırasında bir hata oluştu.');
+                        }
+                    });
+                }
+            });
+
+            // Detaylar Modal İçeriğini yükleme AJAX 
+            $('#detailsModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var yayineviId = button.data('id');
+                var modal = $(this);
+
+                $.ajax({
+                    url: '@Url.Action("Details", "Yayinevleri")',
+                    type: 'GET',
+                    data: { id: yayineviId },
+                    success: function (html) {
+                        modal.find('#detailsModalBody').html(html);
+                    },
+                    error: function () {
+                        showStatusMessage(false, 'Yayınevi detayları yüklenirken bir hata oluştu.');
+                        modal.modal('hide');
+                    }
+                });
+            });
+
+            // Silme İşlemi AJAX 
+            $(document).on('click', '.delete-btn', function(e) {
+                e.preventDefault();
+                var yayineviId = $(this).data('id');
+                var thisRow = $(this).closest('tr');
+
+                if (confirm('Bu yayınevini kalıcı olarak silmek istediğinizden emin misiniz?')) {
+                    var token = $('input[name="__RequestVerificationToken"]').val();
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("Delete", "Yayinevleri")',
+                        data: { 
+                            id: yayineviId,
+                            __RequestVerificationToken: token
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                thisRow.remove();
+                                showStatusMessage(true, response.message);
+                            } else {
+                                showStatusMessage(false, response.message);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            showStatusMessage(false, 'Silme işlemi sırasında bir hata oluştu.');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

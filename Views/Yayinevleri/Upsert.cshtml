@@ -1,0 +1,30 @@
+@model KitaplikApp.Models.Yayinevleri
+
+<form id="upsertForm" asp-action="Upsert">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    
+    <input type="hidden" asp-for="YayineviId" />
+    
+    <div class="form-group mb-3">
+        <label asp-for="YayineviAdi" class="control-label"></label>
+        <input asp-for="YayineviAdi" class="form-control" />
+        <span asp-validation-for="YayineviAdi" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Adres" class="control-label"></label>
+        <input asp-for="Adres" class="form-control" />
+        <span asp-validation-for="Adres" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Telefon" class="control-label"></label>
+        <input asp-for="Telefon" class="form-control" />
+        <span asp-validation-for="Telefon" class="text-danger"></span>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+    </div>
+</form>

@@ -1,0 +1,92 @@
+@model IEnumerable<KitaplikApp.Models.SaticiBasvuru>
+
+@{
+    ViewData["Title"] = "Satıcı Başvuruları";
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card my-4">
+                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                        <h6 class="text-white text-capitalize ps-3">Bekleyen Satıcı Başvuruları</h6>
+                    </div>
+                </div>
+                <div class="card-body px-0 pb-2">
+                    <div class="table-responsive p-0">
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success mx-3" role="alert">
+                                @TempData["SuccessMessage"]
+                            </div>
+                        }
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger mx-3" role="alert">
+                                @TempData["ErrorMessage"]
+                            </div>
+                        }
+
+                        @if (!Model.Any())
+                        {
+                            <div class="alert alert-info mx-3" role="alert">
+                                Şu anda bekleyen satıcı başvurusu bulunmamaktadır.
+                            </div>
+                        }
+                        else
+                        {
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Kullanıcı</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">E-posta</th>
+                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Başvuru Tarihi</th>
+                                        <th class="text-secondary opacity-7"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    <div>
+                                                        <img src="/img/default-user.jpg" class="avatar avatar-sm me-3 border-radius-lg" alt="user1">
+                                                    </div>
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">@Html.DisplayFor(modelItem => item.Kullanici.Ad) @Html.DisplayFor(modelItem => item.Kullanici.Soyad)</h6>
+                                                        <p class="text-xs text-secondary mb-0">Rol: @Html.DisplayFor(modelItem => item.Kullanici.Rol.RolAdi)</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <p class="text-xs font-weight-bold mb-0">@Html.DisplayFor(modelItem => item.Kullanici.Eposta)</p>
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                <span class="text-secondary text-xs font-weight-bold">
+                                                    @item.BasvuruTarihi.ToString("dd MMMM yyyy HH:mm", new System.Globalization.CultureInfo("tr-TR"))
+                                                </span>
+                                            </td>
+                                            <td class="align-middle">
+                                                <form asp-action="ApproveSeller" asp-route-id="@item.Kullanici.KullaniciId" method="post" style="display:inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-success btn-sm mb-0">Onayla</button>
+                                                </form>
+                                                <form asp-action="RejectSeller" asp-route-id="@item.Kullanici.KullaniciId" method="post" style="display:inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-danger btn-sm mb-0" onclick="return confirm('Bu başvuruyu reddetmek istediğinizden emin misiniz?');">Reddet</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

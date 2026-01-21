@@ -1,0 +1,125 @@
+@model KitaplikApp.Models.Kullanicilar
+
+@{
+    ViewData["Title"] = "Kullanıcı Paneli";
+}
+
+<div class="row">
+    <div class="col-md-3">
+        @* Kullanıcı paneli menüsü *@
+        <div class="list-group">
+            <a asp-controller="Dashboard" asp-action="Index" class="list-group-item list-group-item-action active">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a asp-controller="Siparisler" asp-action="Index" class="list-group-item list-group-item-action">
+                <i class="fas fa-shopping-cart"></i> Siparişlerim (@ViewBag.SiparisSayisi)
+            </a>
+            <a asp-controller="Kullanicilar" asp-action="ManageProfile" class="list-group-item list-group-item-action">
+                <i class="fas fa-user-edit"></i> Profil Bilgilerim
+            </a>
+            @* İleride eklenecek diğer linkler *@
+        </div>
+    </div>
+    <div class="col-md-9">
+        <h1>Hoş Geldiniz, @Model.Ad @Model.Soyad</h1>
+        <hr />
+
+        <div class="alert alert-info" role="alert">
+            <h4 class="alert-heading">Kullanıcı Paneline Hoş Geldiniz!</h4>
+            <p>Buradan siparişlerinizi ve profil bilgilerinizi yönetebilirsiniz.</p>
+            <hr>
+            <p class="mb-0">Toplam sipariş sayınız: <strong>@ViewBag.SiparisSayisi</strong></p>
+        </div>
+
+        @if (ViewBag.SonSiparisler != null && ((List<Siparisler>)ViewBag.SonSiparisler).Any())
+        {
+            <h3>Son 5 Siparişiniz</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Sipariş No</th>
+                        <th>Tarih</th>
+                        <th>Toplam Tutar</th>
+                        <th>Durum</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var siparis in (List<Siparisler>)ViewBag.SonSiparisler)
+                    {
+                        <tr>
+                            <td>@siparis.SiparisId</td>
+                            <td>@siparis.SiparisTarihi.ToShortDateString()</td>
+                            <td>@siparis.ToplamTutar TL</td>
+                            <td>@siparis.SiparisDurumu</td>
+                            <td>
+                                @* Düzeltilen buton *@
+                                <button type="button" class="btn btn-info btn-sm details-btn" data-bs-toggle="modal" data-bs-target="#detailsModal" data-id="@siparis.SiparisId" title="Detaylar">
+                                    <i class="bi bi-eye"></i> Detaylar
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>Henüz görüntüleyebileceğiniz bir siparişiniz bulunmamaktadır.</p>
+        }
+    </div>
+</div>
+
+@* Detaylar Modalı *@
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Sipariş Detayları</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="detailsModalBody">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    @Html.AntiForgeryToken()
+    <script>
+        $(document).ready(function () {
+            function showStatusMessage(isSuccess, message) {
+                // Mesaj gösterim fonksiyonu buraya gelecek
+                // Bu fonksiyonu tam olarak kopyalayıp yapıştırabilirsiniz.
+            }
+
+            // Detaylar Modal İçeriği AJAX 
+            $('#detailsModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var siparisId = button.data('id');
+                var modal = $(this);
+                
+                modal.find('.modal-title').text(`Sipariş Detayları: #${siparisId}`);
+
+                $.ajax({
+                    url: '@Url.Action("Details", "Siparisler")',
+                    type: 'GET',
+                    data: { id: siparisId },
+                    success: function (html) {
+                        modal.find('#detailsModalBody').html(html);
+                    },
+                    error: function () {
+                        showStatusMessage(false, 'Sipariş detayları yüklenirken bir hata oluştu.');
+                        modal.modal('hide');
+                    }
+                });
+            });
+        });
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+}

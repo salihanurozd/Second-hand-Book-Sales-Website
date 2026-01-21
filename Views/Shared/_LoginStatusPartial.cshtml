@@ -1,0 +1,42 @@
+@using System.Security.Claims
+
+<ul class="navbar-nav d-flex ms-auto mb-2 mb-lg-0">
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <li class="nav-item">
+            <span class="nav-link text-white">Merhaba, @User.FindFirst(ClaimTypes.Name)?.Value!</span>
+        </li>
+        @if (User.IsInRole("Admin"))
+        {
+            <li class="nav-item">
+                <span class="nav-link text-warning">(Admin)</span>
+            </li>
+        }
+        else if (User.IsInRole("Satici"))
+        {
+            <li class="nav-item">
+                <span class="nav-link text-success">(Satıcı)</span>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item">
+                <span class="nav-link text-info">(Kullanıcı)</span>
+            </li>
+        }
+        <li class="nav-item">
+            <form class="form-inline" asp-controller="Kullanicilar" asp-action="Logout" method="post">
+                <button type="submit" class="nav-link btn btn-link text-white">Çıkış Yap</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-white" asp-controller="Kullanicilar" asp-action="Login">Giriş Yap</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-white" asp-controller="Kullanicilar" asp-action="Register">Kayıt Ol</a>
+        </li>
+    }
+</ul>

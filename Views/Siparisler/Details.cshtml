@@ -1,0 +1,129 @@
+@model KitaplikApp.Models.Siparisler
+@{
+    var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    int currentUserIdInt = 0;
+    if (!string.IsNullOrEmpty(currentUserId))
+    {
+        currentUserIdInt = int.Parse(currentUserId);
+    }
+}
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-4">Sipariş No</dt>
+        <dd class="col-sm-8">@Model.SiparisId</dd>
+
+        <dt class="col-sm-4">Sipariş Tarihi</dt>
+        <dd class="col-sm-8">@Model.SiparisTarihi.ToString("dd.MM.yyyy HH:mm")</dd>
+
+        <dt class="col-sm-4">Toplam Tutar</dt>
+        <dd class="col-sm-8">@Model.ToplamTutar TL</dd>
+
+        <dt class="col-sm-4">Sipariş Durumu</dt>
+        <dd class="col-sm-8">
+            @if (Model.SiparisDurumu == "Beklemede")
+            {
+                <span class="badge bg-warning text-dark">@Model.SiparisDurumu</span>
+            }
+            else if (Model.SiparisDurumu == "Hazırlanıyor")
+            {
+                <span class="badge bg-info text-dark">@Model.SiparisDurumu</span>
+            }
+            else if (Model.SiparisDurumu == "Kargoda")
+            {
+                <span class="badge bg-primary">@Model.SiparisDurumu</span>
+            }
+            else if (Model.SiparisDurumu == "Teslim Edildi")
+            {
+                <span class="badge bg-success">@Model.SiparisDurumu</span>
+            }
+            else if (Model.SiparisDurumu == "İptal Edildi")
+            {
+                <span class="badge bg-danger">@Model.SiparisDurumu</span>
+            }
+            else
+            {
+                <span>@Model.SiparisDurumu</span>
+            }
+        </dd>
+
+        @if (Model.Fatura != null)
+        {
+            <dt class="col-sm-4">Fatura No</dt>
+            <dd class="col-sm-8">@Model.Fatura.FaturaId</dd>
+
+            <dt class="col-sm-4">Fatura Tarihi</dt>
+            <dd class="col-sm-8">@Model.Fatura.FaturaTarihi.ToString("dd.MM.yyyy")</dd>
+        }
+        @if (userRole == "Admin" || userRole == "Satici")
+        {
+            <dt class="col-sm-4">Alıcı Kullanıcı</dt>
+            <dd class="col-sm-8">@(Model.AliciKullanici?.Ad + " " + Model.AliciKullanici?.Soyad) (@Model.AliciKullanici?.Eposta)</dd>
+        }
+
+        <dt class="col-sm-4">Teslimat Adresi</dt>
+        <dd class="col-sm-8">
+            @if (Model.TeslimatAdres != null)
+            {
+                <strong>@Model.TeslimatAdres.AdresBasligi</strong><br />
+                @Model.TeslimatAdres.AcikAdres<br />
+                @($"{Model.TeslimatAdres.Ilce} / {Model.TeslimatAdres.Sehir}, {Model.TeslimatAdres.PostaKodu}")<br />
+                <span>Telefon: @(Model.AliciKullanici?.TelefonNumarasi ?? "N/A")</span>
+            }
+            else
+            {
+                <span>Adres bilgisi bulunamadı.</span>
+            }
+        </dd>
+    </dl>
+
+    @if (userRole == "Satici" || userRole == "Kullanici")
+    {
+        <h4 class="mt-4">Sipariş Edilen Ürünler</h4>
+        @if (Model.SiparisDetaylaris != null && Model.SiparisDetaylaris.Any())
+        {
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Kitap Adı</th>
+                        <th>Yazar</th>
+                        @if (userRole == "Admin") // Admin bu tabloyu görmeyeceği için bu satır gereksiz ancak tutulabilir
+                        {
+                            <th>Satıcı</th>
+                        }
+                        <th class="text-end">Adet</th>
+                        <th class="text-end">Birim Fiyat</th>
+                        <th class="text-end">Ara Toplam</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var detay in Model.SiparisDetaylaris)
+                    {
+                        // Sadece satıcı ise kendi ürünlerini, kullanıcı ise tüm ürünleri görsün
+                        if (userRole == "Satici" && detay.Kitap?.SaticiKullaniciId != currentUserIdInt)
+                        {
+                            continue; // Kendi ürünü değilse atla
+                        }
+
+                        <tr>
+                            <td>@detay.Kitap?.Baslik</td>
+                            <td>@detay.Kitap?.Yazar?.YazarAdi</td>
+                            @if (userRole == "Admin")
+                            {
+                                <td>@(detay.Kitap?.SaticiKullanici?.Ad + " " + detay.Kitap?.SaticiKullanici?.Soyad)</td>
+                            }
+                            <td class="text-end">@detay.Adet</td>
+                            <td class="text-end">@detay.BirimFiyat TL</td>
+                            <td class="text-end">@((detay.Adet * detay.BirimFiyat)) TL</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="alert alert-warning">Bu sipariş için detaylı ürün bilgisi bulunmamaktadır.</div>
+        }
+    }
+    </div>

@@ -1,0 +1,106 @@
+@model KitaplikApp.Models.KullaniciProfilGuncellemeDto
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Profil Ayarları";
+}
+
+<div class="row">
+    <div class="col-md-3">
+        @* Kullanıcı paneli menüsü *@
+        <div class="list-group">
+            <a asp-controller="Dashboard" asp-action="Index" class="list-group-item list-group-item-action">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a asp-controller="Siparisler" asp-action="Index" class="list-group-item list-group-item-action">
+                <i class="fas fa-shopping-cart"></i> Siparişlerim
+            </a>
+            <a asp-controller="Kullanicilar" asp-action="ManageProfile" class="list-group-item list-group-item-action active">
+                <i class="fas fa-user-edit"></i> Profil Bilgilerim
+            </a>
+            <a asp-controller="Adresler" asp-action="Index" class="list-group-item list-group-item-action">
+                <i class="fas fa-map-marker-alt"></i> Adreslerim
+            </a>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <h2>Profil Ayarları</h2>
+        <hr />
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        
+        <form asp-action="ManageProfile" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group">
+                <label asp-for="Ad" class="control-label"></label>
+                <input asp-for="Ad" class="form-control" />
+                <span asp-validation-for="Ad" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Soyad" class="control-label"></label>
+                <input asp-for="Soyad" class="form-control" />
+                <span asp-validation-for="Soyad" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label class="control-label">E-posta</label>
+                <input value="@User.FindFirstValue(ClaimTypes.Email)" class="form-control" readonly />
+            </div>
+            <div class="form-group">
+                <label asp-for="TelefonNumarasi" class="control-label"></label>
+                <input asp-for="TelefonNumarasi" class="form-control" />
+                <span asp-validation-for="TelefonNumarasi" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Biyografi" class="control-label"></label>
+                <textarea asp-for="Biyografi" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Biyografi" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="YeniSifre" class="control-label">Yeni Şifre (Değiştirmek istemiyorsanız boş bırakın)</label>
+                <input asp-for="YeniSifre" class="form-control" type="password" />
+                <span asp-validation-for="YeniSifre" class="text-danger"></span>
+            </div>
+             <div class="form-group">
+                <label asp-for="YeniSifreTekrar" class="control-label">Yeni Şifre Tekrar</label>
+                <input asp-for="YeniSifreTekrar" class="form-control" type="password" />
+                <span asp-validation-for="YeniSifreTekrar" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+        </form>
+
+        <hr />
+        
+        @* Satıcı olma başvuru formu *@
+        @if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin") && !User.IsInRole("Satici"))
+        {
+            <h4 class="mt-4">Satış Yapmak İstiyorum</h4>
+            <p>Satıcı olmak için başvuruda bulunun. Başvurunuz admin tarafından incelendikten sonra size bildirim yapılacaktır.</p>
+            <form asp-action="ApplyForSeller" method="post" class="d-inline">
+                <button type="submit" class="btn btn-warning">Satıcı Olmak İçin Başvur</button>
+            </form>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

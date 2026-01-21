@@ -1,0 +1,61 @@
+@model KitaplikApp.Models.Kullanicilar
+
+@{
+    ViewData["Title"] = "Profil Ayarları";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6 offset-md-3"> 
+        <form asp-action="UpdateProfile" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input type="hidden" asp-for="KullaniciId" /> 
+
+            <div class="form-group mb-3">
+                <label asp-for="Ad" class="control-label"></label>
+                <input asp-for="Ad" class="form-control" />
+                <span asp-validation-for="Ad" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Soyad" class="control-label"></label>
+                <input asp-for="Soyad" class="form-control" />
+                <span asp-validation-for="Soyad" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Eposta" class="control-label"></label>
+                <input asp-for="Eposta" class="form-control" />
+                <span asp-validation-for="Eposta" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="TelefonNumarasi" class="control-label"></label>
+                <input asp-for="TelefonNumarasi" class="form-control" />
+                <span asp-validation-for="TelefonNumarasi" class="text-danger"></span>
+            </div>
+
+            <h4 class="mt-4">Şifre Değiştir</h4>
+            <p class="text-muted">Yeni bir şifre belirlemek istemiyorsanız bu alanları boş bırakınız.</p>
+            <div class="form-group mb-3">
+                <label for="newPassword" class="control-label">Yeni Şifre</label>
+                <input type="password" id="newPassword" name="newPassword" class="form-control" autocomplete="new-password" />
+                <span class="text-danger" data-valmsg-for="newPassword"></span> 
+            </div>
+            <div class="form-group mb-4">
+                <label for="newPasswordConfirm" class="control-label">Yeni Şifre (Tekrar)</label>
+                <input type="password" id="newPasswordConfirm" name="newPasswordConfirm" class="form-control" autocomplete="new-password" />
+                <span class="text-danger" data-valmsg-for="newPasswordConfirm"></span> 
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Profili Güncelle</button>
+                <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Ana Sayfa</a> 
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

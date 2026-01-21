@@ -1,0 +1,27 @@
+@model KitaplikApp.Models.Kategoriler
+
+@{
+    ViewData["Title"] = "Kategori Sil";
+}
+
+<h1>Sil</h1>
+
+<h3>Bu kategoriyi silmek istediğinizden emin misiniz?</h3>
+<div>
+    <h4>Kategori</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.KategoriAdi)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.KategoriAdi)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete" method="post" class="mt-4"> 
+        <input type="hidden" asp-for="KategoriId" />
+        <input type="submit" value="Sil" class="btn btn-danger me-2" /> 
+        <a asp-action="Index" class="btn btn-secondary">Listeye Geri Dön</a>
+    </form>
+</div>

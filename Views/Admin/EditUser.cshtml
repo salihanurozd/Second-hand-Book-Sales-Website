@@ -1,0 +1,69 @@
+@model KitaplikApp.Models.Kullanicilar
+
+@{
+    var isCreate = Model.KullaniciId == 0;
+    Layout = null;
+    var roles = ViewBag.Roles as List<KitaplikApp.Models.Roller>;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title" id="userModalLabel">@(isCreate ? "Yeni Kullanıcı Oluştur" : "Kullanıcı Düzenle")</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <form id="upsertForm" asp-action="EditUser" asp-controller="Admin" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        
+        <input type="hidden" asp-for="KullaniciId" />
+
+        @if (!isCreate)
+        {
+            <input type="hidden" asp-for="KayitTarihi" />
+            <input type="hidden" asp-for="SonGirisTarihi" />
+        }
+
+        <div class="form-group mb-3">
+            <label asp-for="Eposta" class="control-label"></label>
+            <input asp-for="Eposta" class="form-control" />
+            <span asp-validation-for="Eposta" class="text-danger"></span>
+        </div>
+        
+        @if (isCreate)
+        {
+            <div class="form-group mb-3">
+                <label asp-for="Sifre" class="control-label">Şifre</label>
+                <input asp-for="Sifre" type="password" class="form-control" autocomplete="new-password" />
+                <span asp-validation-for="Sifre" class="text-danger"></span>
+            </div>
+        }
+        
+        <div class="form-group mb-3">
+            <label asp-for="Ad" class="control-label"></label>
+            <input asp-for="Ad" class="form-control" />
+            <span asp-validation-for="Ad" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-3">
+            <label asp-for="Soyad" class="control-label"></label>
+            <input asp-for="Soyad" class="form-control" />
+            <span asp-validation-for="Soyad" class="text-danger"></span>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label asp-for="TelefonNumarasi" class="control-label"></label>
+            <input asp-for="TelefonNumarasi" class="form-control" />
+            <span asp-validation-for="TelefonNumarasi" class="text-danger"></span>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label asp-for="RolId" class="control-label"></label>
+            <select asp-for="RolId" class="form-control" asp-items="@(new SelectList(roles, "RolId", "RolAdi"))"></select>
+            <span asp-validation-for="RolId" class="text-danger"></span>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+    <button type="submit" form="upsertForm" class="btn btn-primary">@(isCreate ? "Kullanıcı Ekle" : "Değişiklikleri Kaydet")</button>
+</div>

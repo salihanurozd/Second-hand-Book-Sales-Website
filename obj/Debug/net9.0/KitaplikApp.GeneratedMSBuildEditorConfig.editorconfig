@@ -1,0 +1,249 @@
+is_global = true
+build_property.TargetFramework = net9.0
+build_property.TargetFramework = net9.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = KitaplikApp
+build_property.RootNamespace = KitaplikApp
+build_property.ProjectDir = /Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 9.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = /Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 9.0
+build_property.EnableCodeStyleSeverity = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Account/AccessDenied.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9BY2Nlc3NEZW5pZWQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Account/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9Mb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Account/ManageProfile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9NYW5hZ2VQcm9maWxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Account/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9SZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Admin/DeleteUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vRGVsZXRlVXNlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Admin/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Admin/EditUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vRWRpdFVzZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Admin/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Admin/SellerApplications.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vU2VsbGVyQXBwbGljYXRpb25zLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Adresler/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRyZXNsZXIvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Dashboard/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGFzaGJvYXJkL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Favoriler/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRmF2b3JpbGVyL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Qcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Kategoriler/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS2F0ZWdvcmlsZXIvRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Kategoriler/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS2F0ZWdvcmlsZXIvRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Kategoriler/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS2F0ZWdvcmlsZXIvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Kategoriler/Upsert.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS2F0ZWdvcmlsZXIvVXBzZXJ0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/KitapDurumlari/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS2l0YXBEdXJ1bWxhcmkvRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/KitapDurumlari/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS2l0YXBEdXJ1bWxhcmkvRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/KitapDurumlari/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS2l0YXBEdXJ1bWxhcmkvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/KitapDurumlari/Upsert.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS2l0YXBEdXJ1bWxhcmkvVXBzZXJ0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Kitaplar/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS2l0YXBsYXIvRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Kitaplar/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS2l0YXBsYXIvRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Kitaplar/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS2l0YXBsYXIvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Kitaplar/MainIndex.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS2l0YXBsYXIvTWFpbkluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Kitaplar/MyBooks.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS2l0YXBsYXIvTXlCb29rcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Kitaplar/Upsert.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS2l0YXBsYXIvVXBzZXJ0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Kullanicilar/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS3VsbGFuaWNpbGFyL0xvZ2luLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Kullanicilar/ManageProfile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS3VsbGFuaWNpbGFyL01hbmFnZVByb2ZpbGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Kullanicilar/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS3VsbGFuaWNpbGFyL1JlZ2lzdGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Kullanicilar/SifremiUnuttum.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvS3VsbGFuaWNpbGFyL1NpZnJlbWlVbnV0dHVtLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Sepetler/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2VwZXRsZXIvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Shared/Components/CartSummary/Default.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL0NvbXBvbmVudHMvQ2FydFN1bW1hcnkvRGVmYXVsdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL0Vycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Shared/_LoginStatusPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19Mb2dpblN0YXR1c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Siparisler/Checkout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2lwYXJpc2xlci9DaGVja291dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Siparisler/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2lwYXJpc2xlci9EZWxldGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Siparisler/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2lwYXJpc2xlci9EZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Siparisler/GelenSiparisler.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2lwYXJpc2xlci9HZWxlblNpcGFyaXNsZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Siparisler/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2lwYXJpc2xlci9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Siparisler/SaticiSiparisler.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2lwYXJpc2xlci9TYXRpY2lTaXBhcmlzbGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Siparisler/UpdateStatus.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2lwYXJpc2xlci9VcGRhdGVTdGF0dXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Yayinevleri/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvWWF5aW5ldmxlcmkvRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Yayinevleri/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvWWF5aW5ldmxlcmkvRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Yayinevleri/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvWWF5aW5ldmxlcmkvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Yayinevleri/Upsert.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvWWF5aW5ldmxlcmkvVXBzZXJ0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Yazarlar/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvWWF6YXJsYXIvRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Yazarlar/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvWWF6YXJsYXIvRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Yazarlar/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvWWF6YXJsYXIvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Yazarlar/Upsert.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvWWF6YXJsYXIvVXBzZXJ0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/salihanurozdemir/Desktop/staj/projemvc/KitaplikApp/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-bvh9eqr4dl

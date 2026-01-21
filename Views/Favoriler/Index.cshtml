@@ -1,0 +1,125 @@
+@model IEnumerable<KitaplikApp.Models.FavoriKitaplar>
+
+@{
+    ViewData["Title"] = "Favori Kitaplarım";
+}
+
+<h1>Favori Kitaplarım</h1>
+
+<div id="favoriler-container"> 
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info" role="alert">
+            Favori listenizde hiç kitap bulunmamaktadır.
+        </div>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Kitap Görseli
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Kitap.Baslik)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Kitap.Fiyat)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @{
+                                var defaultImage = "/images/default_kitap.png"; 
+                                var imageUrl = item.Kitap?.KitapGorselleri?.FirstOrDefault()?.ResimUrl ?? defaultImage;
+                            }
+                            <img src="@imageUrl" alt="@item.Kitap?.Baslik" style="width: 80px; height: 120px; object-fit: cover;" />
+                        </td>
+                        <td>
+                            <a asp-controller="Kitaplar" asp-action="Details" asp-route-id="@item.KitapId">
+                                @Html.DisplayFor(modelItem => item.Kitap.Baslik)
+                            </a>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Kitap.Fiyat) ₺
+                        </td>
+                        <td>
+                            @* Favorilerden Çıkar butonu *@
+                            <form asp-action="Remove" asp-controller="Favoriler" method="post" data-kitap-id="@item.KitapId" class="remove-from-fav-form">
+                                <input type="hidden" name="kitapId" value="@item.KitapId" />
+                                <button type="submit" class="btn btn-danger btn-sm">Favorilerden Çıkar</button>
+                            </form>
+                            @* Favori Listesinden Sepete Ekle butonu *@
+                            <form asp-action="AddItem" asp-controller="Sepetler" method="post" data-kitap-id="@item.KitapId" class="add-to-cart-form mt-2">
+                                <input type="hidden" name="kitapId" value="@item.KitapId" />
+                                <input type="hidden" name="miktar" value="1" />
+                                <button type="submit" class="btn btn-primary btn-sm">Sepete Ekle</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Favoriden Çıkar Formunun Gönderilmesi
+            $('.remove-from-fav-form').submit(function (e) {
+                e.preventDefault(); 
+                var form = $(this); 
+                var kitapId = form.data('kitap-id'); 
+
+                $.ajax({
+                    url: form.attr('action'),
+                    type: form.attr('method'), 
+                    data: form.serialize(), 
+                    success: function (response) {
+                        if (response.success) {
+                            alert(response.message);
+                            form.closest('tr').remove(); 
+                            if ($('table tbody tr').length === 0) {
+                                $('#favoriler-container').empty().append('<div class="alert alert-info" role="alert">Favori listenizde hiç kitap bulunmamaktadır.</div>');
+                            }
+                        } else {
+                            alert(response.message); 
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Bir hata oluştu: " + error); 
+                    }
+                });
+            });
+
+            // Sepete Ekle Formunun Gönderilmesi (Favoriler sayfasından)
+            $('.add-to-cart-form').submit(function (e) {
+                e.preventDefault();
+                var form = $(this); 
+
+                $.ajax({
+                    url: form.attr('action'), 
+                    type: form.attr('method'), 
+                    data: form.serialize(), 
+                    success: function (response) {
+                        if (response.success) {
+                            alert(response.message);
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Bir hata oluştu: " + error);
+                    }
+                });
+            });
+        });
+    </script>
+}

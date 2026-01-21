@@ -1,0 +1,57 @@
+@model KitaplikApp.Models.Kitaplar
+
+@{
+    Layout = null;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title" id="deleteModalLabel">@Model.Baslik kitabını sil</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <h3>Bu kitabı kalıcı olarak silmek istediğinizden emin misiniz?</h3>
+    <div>
+        <hr />
+        <dl class="row">
+            <dt class = "col-sm-4">
+                @Html.DisplayNameFor(model => model.Baslik)
+            </dt>
+            <dd class = "col-sm-8">
+                @Html.DisplayFor(model => model.Baslik)
+            </dd>
+            <dt class = "col-sm-4">
+                @Html.DisplayNameFor(model => model.Yazar)
+            </dt>
+            <dd class = "col-sm-8">
+                @Html.DisplayFor(model => model.Yazar!.YazarAdi)
+            </dd>
+            <dt class = "col-sm-4">
+                @Html.DisplayNameFor(model => model.Yayinevi)
+            </dt>
+            <dd class = "col-sm-8">
+                @Html.DisplayFor(model => model.Yayinevi!.YayineviAdi)
+            </dd>
+            <dt class = "col-sm-4">
+                @Html.DisplayNameFor(model => model.Fiyat)
+            </dt>
+            <dd class = "col-sm-8">
+                @Html.DisplayFor(model => model.Fiyat) TL
+            </dd>
+            <dt class = "col-sm-4">
+                @Html.DisplayNameFor(model => model.OnayDurumu)
+            </dt>
+            <dd class = "col-sm-8">
+                @Html.DisplayFor(model => model.OnayDurumu)
+            </dd>
+        </dl>
+    </div>
+</div>
+    
+<div class="modal-footer">
+    <form asp-action="Delete" method="post" id="deleteForm">
+        <input type="hidden" asp-for="KitapId" />
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+        <button type="submit" class="btn btn-danger">Sil</button>
+    </form>
+</div>

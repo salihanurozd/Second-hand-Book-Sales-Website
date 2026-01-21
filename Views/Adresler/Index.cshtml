@@ -1,0 +1,291 @@
+@model IEnumerable<KitaplikApp.Models.Adresler>
+
+@{
+    ViewData["Title"] = "Adreslerim";
+}
+
+<h1>Adreslerim</h1>
+<p>
+    <button id="btnYeniAdresEkle" type="button" class="btn btn-primary">Yeni Adres Ekle</button>
+</p>
+
+@* Bildirim mesajları için alan *@
+<div id="statusMessageContainer" class="mt-3"></div>
+<div id="validationErrors" class="mt-3"></div>
+
+@* Yeni adres ekleme formu *@
+<div id="createAdresFormContainer" class="card p-3 mb-4" style="display:none;">
+    <h4 class="card-title">Yeni Adres Ekle</h4>
+    <form asp-action="Create" method="post" id="createAdresForm">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group mb-3">
+            <label for="AdresBasligi" class="control-label">Adres Başlığı</label>
+            <input name="AdresBasligi" class="form-control" />
+            <span class="text-danger" data-valmsg-for="AdresBasligi"></span>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="Sehir" class="control-label">Şehir</label>
+            <input name="Sehir" class="form-control" />
+            <span class="text-danger" data-valmsg-for="Sehir"></span>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="Ilce" class="control-label">İlçe</label>
+            <input name="Ilce" class="form-control" />
+            <span class="text-danger" data-valmsg-for="Ilce"></span>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="AcikAdres" class="control-label">Açık Adres</label>
+            <textarea name="AcikAdres" class="form-control"></textarea>
+            <span class="text-danger" data-valmsg-for="AcikAdres"></span>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="PostaKodu" class="control-label">Posta Kodu</label>
+            <input name="PostaKodu" class="form-control" />
+            <span class="text-danger" data-valmsg-for="PostaKodu"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success">Kaydet</button>
+        <button type="button" class="btn btn-secondary" id="btnCreateIptal">İptal</button>
+    </form>
+</div>
+
+<hr />
+
+@* Adres listesi tablosu *@
+<div id="adresListesiContainer">
+    @if (Model != null && Model.Any())
+    {
+        <table class="table table-striped mt-3" id="adresTable">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.AdresBasligi)</th>
+                    <th>@Html.DisplayNameFor(model => model.Sehir)</th>
+                    <th>@Html.DisplayNameFor(model => model.Ilce)</th>
+                    <th>@Html.DisplayNameFor(model => model.AcikAdres)</th>
+                    <th>@Html.DisplayNameFor(model => model.PostaKodu)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr id="adres-row-@item.AdresId">
+                        <td data-field="AdresBasligi">@Html.DisplayFor(modelItem => item.AdresBasligi)</td>
+                        <td data-field="Sehir">@Html.DisplayFor(modelItem => item.Sehir)</td>
+                        <td data-field="Ilce">@Html.DisplayFor(modelItem => item.Ilce)</td>
+                        <td data-field="AcikAdres">@Html.DisplayFor(modelItem => item.AcikAdres)</td>
+                        <td data-field="PostaKodu">@Html.DisplayFor(modelItem => item.PostaKodu)</td>
+                        <td class="text-end">
+                            <button type="button" class="btn btn-sm btn-warning btn-edit" data-id="@item.AdresId">Düzenle</button>
+                            <button type="button" class="btn btn-sm btn-danger btn-delete" data-id="@item.AdresId">Sil</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info mt-4" role="alert" id="emptyAdresMessage">
+            Henüz kayıtlı bir adresiniz bulunmamaktadır. Yeni bir adres ekleyerek başlayabilirsiniz.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+
+            var antiForgeryToken = $('input[name="__RequestVerificationToken"]').val();
+            $.ajaxSetup({
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('RequestVerificationToken', antiForgeryToken);
+                }
+            });
+
+            // Bildirim mesajı gösteren fonksiyon
+            function showNotification(message, type = 'success', isValidation = false) {
+                var container = isValidation ? $('#validationErrors') : $('#statusMessageContainer');
+                container.empty();
+                var alertDiv = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+                container.prepend(alertDiv);
+                setTimeout(function () { $('.alert').alert('close'); }, 5000);
+            }
+
+            // Yeni adres ekleme formu göster/gizle
+            $('#btnYeniAdresEkle').click(function () {
+                $('#createAdresFormContainer').slideDown();
+                $('#validationErrors').empty();
+            });
+            $('#btnCreateIptal').click(function () {
+                $('#createAdresFormContainer').slideUp();
+                $('#createAdresForm')[0].reset();
+                $('#validationErrors').empty();
+            });
+            
+            // Yeni adres ekleme AJAX
+            $('#createAdresForm').submit(function (e) {
+                e.preventDefault();
+                var form = $(this);
+                $('#validationErrors').empty();
+                
+                if (form.valid()) {
+                    $.ajax({
+                        url: '@Url.Action("Create", "Adresler")',
+                        type: 'POST',
+                        data: form.serialize(),
+                        success: function (response) {
+                            if (response.success) {
+                                showNotification(response.message, 'success');
+                                $('#createAdresFormContainer').slideUp();
+                                form[0].reset();
+                                
+                                var newRow = `<tr id="adres-row-${response.adres.adresId}">
+                                    <td data-field="AdresBasligi">${response.adres.adresBasligi}</td>
+                                    <td data-field="Sehir">${response.adres.sehir}</td>
+                                    <td data-field="Ilce">${response.adres.ilce}</td>
+                                    <td data-field="AcikAdres">${response.adres.acikAdres}</td>
+                                    <td data-field="PostaKodu">${response.adres.postaKodu}</td>
+                                    <td class="text-end">
+                                        <button type="button" class="btn btn-sm btn-warning btn-edit" data-id="${response.adres.adresId}">Düzenle</button>
+                                        <button type="button" class="btn btn-sm btn-danger btn-delete" data-id="${response.adres.adresId}">Sil</button>
+                                    </td>
+                                </tr>`;
+                                
+                                if ($('#adresTable tbody').length === 0) {
+                                    $('#adresListesiContainer').html(`<table class="table table-striped mt-3" id="adresTable"><thead>...</thead><tbody></tbody></table>`);
+                                }
+                                $('#adresTable tbody').append(newRow);
+                                $('#emptyAdresMessage').hide();
+                            } else {
+                                if(response.message) {
+                                    showNotification(response.message, 'danger');
+                                } else if(response.errors) {
+                                    let errorMessages = '';
+                                    for (let key in response.errors) {
+                                        errorMessages += '<div>' + response.errors[key].join('<br/>') + '</div>';
+                                    }
+                                    showNotification(errorMessages, 'danger', true);
+                                } else {
+                                    showNotification('Adres eklenirken bir hata oluştu.', 'danger');
+                                }
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            showNotification('Adres eklenirken bir hata oluştu.', 'danger');
+                        }
+                    });
+                } else {
+                    showNotification('Lütfen tüm alanları doğru şekilde doldurun.', 'danger', true);
+                }
+            });
+
+            // Düzenle butonu tıklaması
+            $(document).on('click', '.btn-edit', function () {
+                var adresId = $(this).data('id');
+                var row = $(`#adres-row-${adresId}`);
+                var adresBasligi = row.find('td[data-field="AdresBasligi"]').text().trim();
+                var sehir = row.find('td[data-field="Sehir"]').text().trim();
+                var ilce = row.find('td[data-field="Ilce"]').text().trim();
+                var acikAdres = row.find('td[data-field="AcikAdres"]').text().trim();
+                var postaKodu = row.find('td[data-field="PostaKodu"]').text().trim();
+
+                // Satırı düzenleme formuna dönüştür
+                row.html(`<td colspan="6">
+                    <form class="edit-form" data-id="${adresId}" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="AdresId" value="${adresId}" />
+                        <div class="row align-items-center">
+                            <div class="col-2"><input name="AdresBasligi" value="${adresBasligi}" class="form-control" /></div>
+                            <div class="col-2"><input name="Sehir" value="${sehir}" class="form-control" /></div>
+                            <div class="col-2"><input name="Ilce" value="${ilce}" class="form-control" /></div>
+                            <div class="col-3"><input name="AcikAdres" value="${acikAdres}" class="form-control" /></div>
+                            <div class="col-1"><input name="PostaKodu" value="${postaKodu}" class="form-control" /></div>
+                            <div class="col-2 text-end">
+                                <button type="submit" class="btn btn-sm btn-success">Kaydet</button>
+                                <button type="button" class="btn btn-sm btn-secondary btn-edit-cancel">İptal</button>
+                            </div>
+                        </div>
+                    </form>
+                </td>`);
+            });
+
+            // Düzenleme İptal butonu
+            $(document).on('click', '.btn-edit-cancel', function () {
+                location.reload(); 
+            });
+
+            // Düzenleme formunu gönderme AJAX
+            $(document).on('submit', '.edit-form', function (e) {
+                e.preventDefault();
+                var form = $(this);
+                var adresId = form.data('id');
+                
+                $.ajax({
+                    url: '@Url.Action("Edit", "Adresler")',
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            showNotification(response.message, 'success');
+                            var updatedRow = $(`#adres-row-${adresId}`);
+                            updatedRow.html(`
+                                <td data-field="AdresBasligi">${response.updatedAdres.adresBasligi}</td>
+                                <td data-field="Sehir">${response.updatedAdres.sehir}</td>
+                                <td data-field="Ilce">${response.updatedAdres.ilce}</td>
+                                <td data-field="AcikAdres">${response.updatedAdres.acikAdres}</td>
+                                <td data-field="PostaKodu">${response.updatedAdres.postaKodu}</td>
+                                <td class="text-end">
+                                    <button type="button" class="btn btn-sm btn-warning btn-edit" data-id="${adresId}">Düzenle</button>
+                                    <button type="button" class="btn btn-sm btn-danger btn-delete" data-id="${adresId}">Sil</button>
+                                </td>
+                            `);
+                        } else {
+                            showNotification(response.message, 'danger');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        showNotification('Adres güncellenirken bir hata oluştu.', 'danger');
+                    }
+                });
+            });
+
+            // Silme butonu tıklaması
+            $(document).on('click', '.btn-delete', function () {
+                if (confirm('Bu adresi silmek istediğinizden emin misiniz?')) {
+                    var adresId = $(this).data('id');
+                    
+                    $.ajax({
+                        url: '@Url.Action("Delete", "Adresler")',
+                        type: 'POST',
+                        data: {
+                            'id': adresId
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                showNotification(response.message, 'success');
+                                $(`#adres-row-${adresId}`).remove();
+                                if ($('#adresTable tbody tr').length === 0) {
+                                    $('#adresTable').hide();
+                                    $('#emptyAdresMessage').show();
+                                }
+                            } else {
+                                showNotification(response.message, 'danger');
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            showNotification('Adres silinirken bir hata oluştu.', 'danger');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
